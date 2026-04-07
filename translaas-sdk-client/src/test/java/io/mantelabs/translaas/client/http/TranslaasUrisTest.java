@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import io.mantelabs.translaas.client.CacheMode;
+import io.mantelabs.translaas.client.TestApiUrls;
 import io.mantelabs.translaas.client.TranslaasOptions;
 import io.mantelabs.translaas.client.TranslaasRequestContext;
 import io.mantelabs.translaas.models.exception.TranslaasConfigurationException;
@@ -16,23 +17,20 @@ class TranslaasUrisTest {
 
   @Test
   void normalizeApiOrigin_stripsPathAndQuery() {
-    URI in = URI.create("https://api.mantelabs.io/sdk/v1/extra?x=1#frag");
-    assertThat(TranslaasUris.normalizeApiOrigin(in))
-        .hasToString("https://api.mantelabs.io");
+    URI in = URI.create(TestApiUrls.ORIGIN + "/sdk/v1/extra?x=1#frag");
+    assertThat(TranslaasUris.normalizeApiOrigin(in)).hasToString(TestApiUrls.ORIGIN);
   }
 
   @Test
   void normalizeApiOrigin_trailingSlashInInput_yieldsOriginWithoutPath() {
-    URI in = URI.create("https://api.mantelabs.io/");
-    assertThat(TranslaasUris.normalizeApiOrigin(in))
-        .hasToString("https://api.mantelabs.io");
+    URI in = URI.create(TestApiUrls.ORIGIN + "/");
+    assertThat(TranslaasUris.normalizeApiOrigin(in)).hasToString(TestApiUrls.ORIGIN);
   }
 
   @Test
   void normalizeApiOrigin_preservesNonDefaultPort() {
-    URI in = URI.create("https://api.mantelabs.io:8443/foo");
-    assertThat(TranslaasUris.normalizeApiOrigin(in))
-        .hasToString("https://api.mantelabs.io:8443");
+    URI in = URI.create(TestApiUrls.ORIGIN_PORT_8443 + "/foo");
+    assertThat(TranslaasUris.normalizeApiOrigin(in)).hasToString(TestApiUrls.ORIGIN_PORT_8443);
   }
 
   @Test
@@ -43,12 +41,12 @@ class TranslaasUrisTest {
 
   @Test
   void buildUri_appendsPathOnce_noDuplicateSdkSegment() {
-    URI origin = URI.create("https://api.mantelabs.io");
+    URI origin = URI.create(TestApiUrls.ORIGIN);
     URI full =
         TranslaasUris.buildUri(
             origin, "/sdk/v1/translations/text", Map.of("locale", "en", "q", "a b"));
     assertThat(full.getScheme()).isEqualTo("https");
-    assertThat(full.getHost()).isEqualTo("api.mantelabs.io");
+    assertThat(full.getHost()).isEqualTo(TestApiUrls.HOST);
     assertThat(full.getPath()).isEqualTo("/sdk/v1/translations/text");
     assertThat(full.getRawQuery()).contains("locale=en");
     assertThat(full.getRawQuery()).contains("q=a+b");
@@ -59,9 +57,9 @@ class TranslaasUrisTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl("https://api.mantelabs.io/sdk/v1/")
+            .baseUrl(TestApiUrls.ORIGIN + "/sdk/v1/")
             .build();
-    assertThat(options.getBaseUrl()).hasToString("https://api.mantelabs.io");
+    assertThat(options.getBaseUrl()).hasToString(TestApiUrls.ORIGIN);
   }
 
   @Test
@@ -69,7 +67,7 @@ class TranslaasUrisTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl("https://api.mantelabs.io")
+            .baseUrl(TestApiUrls.ORIGIN)
             .channel("default-ch")
             .snapshotVersion("1")
             .build();
@@ -89,7 +87,7 @@ class TranslaasUrisTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl("https://api.mantelabs.io")
+            .baseUrl(TestApiUrls.ORIGIN)
             .cacheMode(CacheMode.NONE)
             .includeContextDefault(true)
             .build();

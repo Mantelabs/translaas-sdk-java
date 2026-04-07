@@ -12,9 +12,9 @@ class ClientModuleTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl("https://api.mantelabs.io")
+            .baseUrl(TestApiUrls.ORIGIN)
             .build();
-    assertThat(options.getBaseUrl().getHost()).isEqualTo("api.mantelabs.io");
+    assertThat(options.getBaseUrl().getHost()).isEqualTo(TestApiUrls.HOST);
     assertThat(new TranslaasHttp(options)).isNotNull();
   }
 }

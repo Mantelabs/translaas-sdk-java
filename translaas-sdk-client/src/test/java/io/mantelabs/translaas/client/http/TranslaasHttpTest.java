@@ -5,9 +5,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import io.mantelabs.translaas.client.TestApiUrls;
 import io.mantelabs.translaas.client.TranslaasOptions;
 import io.mantelabs.translaas.client.TranslaasRequestContext;
-import java.net.URI;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -38,7 +38,7 @@ class TranslaasHttpTest {
     options =
         TranslaasOptions.builder()
             .apiKey("secret-key")
-            .baseUrl("https://api.mantelabs.io")
+            .baseUrl(TestApiUrls.ORIGIN)
             .apiKeyHeader("X-Api-Key")
             .build();
     http = new TranslaasHttp(options, httpInvoker);
@@ -96,7 +96,7 @@ class TranslaasHttpTest {
     TranslaasOptions withV =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl("https://api.mantelabs.io")
+            .baseUrl(TestApiUrls.ORIGIN)
             .snapshotVersion("42")
             .build();
     TranslaasHttp h = new TranslaasHttp(withV, httpInvoker);
