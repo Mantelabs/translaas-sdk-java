@@ -1,0 +1,343 @@
+# Translaas SDK for Java
+
+CI
+Maven Central
+License
+Java
+GitHub stars
+
+A strongly typed, modular Java SDK for consuming the **Translaas Translation Delivery API**. Use it to fetch translations in JVM applications with compile-time safety and familiar Java APIs.
+
+Published artifacts use the `**io.mantelabs`** group ID (reverse-DNS for [mantelabs.io](https://mantelabs.io)). Example `baseUrl` values below assume the hosted API at `**https://api.mantelabs.io**`; use whatever origin matches your deployment.
+
+## Features
+
+- **Strongly typed API** — Models and configuration types instead of untyped maps
+- **Convenience API** — Simple translation lookups via `TranslaasService` (for example a `t` / fluent helper, aligned with other language SDKs)
+- **Automatic language resolution** — Optional locale when language providers are configured
+- **Flexible caching** — Pluggable or built-in cache modes (memory, entry, group, project) where the SDK exposes them
+- **Offline / hybrid caching** — File-based bundles when supported by the client module
+- **Resilience** — Configurable timeouts and retry policies on the HTTP layer
+- **Modular artifacts** — Optional split modules (core client, models, integrations) if published separately
+- **Async-friendly** — Asynchronous calls where the API exposes them (`CompletableFuture`, or virtual-thread friendly blocking APIs on modern JDKs)
+- **Standard build tooling** — Published to Maven Central; works with Maven, Gradle, and other JVM build tools
+
+## Requirements
+
+- **JDK 11** or newer (LTS releases recommended for production)
+
+## Installation
+
+### Maven
+
+```xml
+<dependency>
+  <groupId>io.mantelabs</groupId>
+  <artifactId>translaas-sdk</artifactId>
+  <version>x.y.z</version><!-- replace with the current version from Maven Central -->
+</dependency>
+```
+
+### Gradle (Kotlin DSL)
+
+```kotlin
+dependencies {
+    implementation("io.mantelabs:translaas-sdk:x.y.z") // replace with the current version from Maven Central
+}
+```
+
+### Gradle (Groovy)
+
+```groovy
+dependencies {
+    implementation 'io.mantelabs:translaas-sdk:+'
+}
+```
+
+Pin an explicit version in production builds instead of dynamic `+` resolution.
+
+### Bill of Materials (BOM)
+
+If a BOM is published for aligned versions:
+
+```xml
+<dependencyManagement>
+  <dependencies>
+    <dependency>
+      <groupId>io.mantelabs</groupId>
+      <artifactId>translaas-sdk-bom</artifactId>
+      <version>x.y.z</version>
+      <type>pom</type>
+      <scope>import</scope>
+    </dependency>
+  </dependencies>
+</dependencyManagement>
+```
+
+## Quick start
+
+### 1. Add the dependency
+
+Use the Maven or Gradle snippet above with the current version from [Maven Central](https://central.sonatype.com/).
+
+### 2. Create a client
+
+**Option A — `TranslaasService` (convenience lookups)**
+
+```java
+import io.mantelabs.translaas.CacheMode;
+import io.mantelabs.translaas.LanguageCodes;
+import io.mantelabs.translaas.TranslaasOptions;
+import io.mantelabs.translaas.TranslaasService;
+
+TranslaasOptions options = TranslaasOptions.builder()
+    .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+    .baseUrl("https://api.mantelabs.io")
+    .cacheMode(CacheMode.GROUP)
+    .build();
+
+TranslaasService translaas = new TranslaasService(options);
+
+// Example: async style (exact method names follow the shipped API)
+var welcome = translaas.t("common", "welcome", LanguageCodes.ENGLISH).join();
+
+// With automatic language resolution when providers are configured
+var welcomeAuto = translaas.t("common", "welcome").join();
+
+// Pluralization (signature mirrors server / SDK contract)
+var items = translaas.t("messages", "item", LanguageCodes.ENGLISH, 5).join();
+```
+
+**Option B — `TranslaasClient` (full HTTP API)**
+
+```java
+import io.mantelabs.translaas.LanguageCodes;
+import io.mantelabs.translaas.TranslaasClient;
+import io.mantelabs.translaas.TranslaasOptions;
+
+TranslaasOptions options = TranslaasOptions.builder()
+    .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+    .baseUrl("https://api.mantelabs.io")
+    .build();
+
+TranslaasClient client = new TranslaasClient(options);
+
+var translation = client.getEntry("common", "welcome", "en").join();
+```
+
+Use blocking adapters if the SDK provides them (for example `getEntryBlocking`) in servlet-style code; prefer async APIs on structured concurrency or event-loop style runtimes when available.
+
+## Configuration
+
+### Basic configuration
+
+```java
+TranslaasOptions options = TranslaasOptions.builder()
+    .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+    .baseUrl("https://api.mantelabs.io")
+    .build();
+
+TranslaasService translaas = new TranslaasService(options);
+```
+
+### Advanced configuration
+
+```java
+TranslaasOptions options = TranslaasOptions.builder()
+    .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+    .baseUrl("https://api.mantelabs.io")
+    .defaultLanguage(LanguageCodes.ENGLISH)
+    .cacheMode(CacheMode.GROUP)
+    .cacheAbsoluteExpiration(Duration.ofHours(1))
+    .cacheSlidingExpiration(Duration.ofMinutes(15))
+    .timeout(Duration.ofSeconds(30))
+    .build();
+```
+
+**Configuration options**
+
+
+| Option                    | Required | Description                                               |
+| ------------------------- | -------- | --------------------------------------------------------- |
+| `apiKey`                  | **Yes**  | Translaas API key                                         |
+| `baseUrl`                 | **Yes**  | API origin only (do **not** append `/api`)                |
+| `defaultLanguage`         | No       | Default locale / language code                            |
+| `cacheMode`               | No       | `NONE`, `ENTRY`, `GROUP`, `PROJECT` (names as in the SDK) |
+| `cacheAbsoluteExpiration` | No       | Absolute cache TTL                                        |
+| `cacheSlidingExpiration`  | No       | Sliding cache TTL                                         |
+| `timeout`                 | No       | HTTP client timeout                                       |
+
+
+Exact types (`Duration`, enums, builders) follow the published Javadoc.
+
+### Environment variables and system properties
+
+Typical mappings (names may match other Translaas SDKs):
+
+```bash
+# Shell / container
+export TRANSLAAS_API_KEY=your-api-key
+export TRANSLAAS_BASE_URL=https://api.mantelabs.io
+export TRANSLAAS_CACHE_MODE=GROUP
+export TRANSLAAS_DEFAULT_LANGUAGE=en
+```
+
+```java
+TranslaasOptions options = TranslaasOptions.builder()
+    .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+    .baseUrl(System.getenv().getOrDefault("TRANSLAAS_BASE_URL", "https://api.mantelabs.io"))
+    .cacheMode(CacheMode.valueOf(System.getenv().getOrDefault("TRANSLAAS_CACHE_MODE", "NONE")))
+    .defaultLanguage(System.getenv("TRANSLAAS_DEFAULT_LANGUAGE"))
+    .build();
+```
+
+On Java you can also layer **Spring Boot** `application.properties` / YAML, **Micronaut**, or **Quarkus** config, mapping keys into `TranslaasOptions` in `@Configuration` beans.
+
+Keep secrets out of source control; use env vars, vaults, or your platform’s secret store.
+
+## Usage examples
+
+### Single translation entry
+
+**With `TranslaasService`**
+
+```java
+var translation = translaas.t("ui", "button.save", LanguageCodes.ENGLISH).join();
+var withPlural = translaas.t("messages", "item.count", LanguageCodes.ENGLISH, 5).join();
+```
+
+**With `TranslaasClient`**
+
+```java
+var translation = client.getEntry("ui", "button.save", LanguageCodes.ENGLISH).join();
+var withPlural = client.getEntry("messages", "item.count", LanguageCodes.ENGLISH, 5).join();
+```
+
+## JVM compatibility
+
+
+| Environment               | Notes                                                               |
+| ------------------------- | ------------------------------------------------------------------- |
+| JDK 11+                   | Baseline for this library                                           |
+| JDK 17+ / 21+             | Recommended LTS for new services                                    |
+| Virtual threads (JDK 21+) | Use with blocking HTTP APIs or SDK blocking wrappers where provided |
+
+
+## Error handling
+
+```java
+import io.mantelabs.translaas.LanguageCodes;
+import io.mantelabs.translaas.TranslaasApiException;
+
+try {
+    var translation = client.getEntry("group", "entry", LanguageCodes.ENGLISH).join();
+} catch (TranslaasApiException e) {
+    System.err.println("Translaas error: " + e.getMessage());
+    if (e.getStatusCode() != null) {
+        System.err.println("HTTP status: " + e.getStatusCode());
+    }
+} catch (Exception e) {
+    System.err.println("Unexpected error: " + e.getMessage());
+}
+```
+
+Prefer typed exceptions from the SDK; map HTTP status codes and I/O failures as documented in Javadoc.
+
+## Development
+
+### Build from source
+
+```bash
+git clone https://github.com/Mantelabs/translaas-sdk-java.git
+cd translaas-sdk-java
+./mvnw -q verify
+```
+
+Or with Gradle:
+
+```bash
+./gradlew build
+```
+
+Use the wrapper script committed in the repository (`mvnw` / `gradlew`) so the toolchain version stays consistent in CI and locally.
+
+### Run tests
+
+```bash
+./mvnw test
+```
+
+### Coverage (JaCoCo or configured reporter)
+
+```bash
+./mvnw verify
+# Open target/site/jacoco/index.html when JaCoCo is enabled
+```
+
+## API endpoints
+
+The SDK talks to the Translaas HTTP API. `baseUrl` must be the origin only (for example `https://api.mantelabs.io`).
+
+
+| Endpoint                              | Method | Purpose                                     |
+| ------------------------------------- | ------ | ------------------------------------------- |
+| `/sdk/v1/translations/text`           | GET    | Single translation entry                    |
+| `/sdk/v1/translations/group`          | GET    | All translations for a group                |
+| `/sdk/v1/translations/project`        | GET    | All translations for a project              |
+| `/sdk/v1/translations/locales`        | GET    | Locales for a project                       |
+| `/sdk/v1/translations/report-missing` | POST   | Report missing keys (project-scoped key)    |
+| `/sdk/v1/translations/offline-cache`  | GET    | Offline translation ZIP bundle              |
+| `/api/v1/api-keys/validate`           | GET    | Validate API key (connectivity / bootstrap) |
+
+
+Translation routes use GET with query parameters except `report-missing` (JSON body). Optional query flags include `channel`, `v`, and `includeContext` where the API supports them—surface them via options or per-call parameters on the client.
+
+## Authentication
+
+Send the API key using the `X-Api-Key` header (as defined in the OpenAPI spec). Configure it when building `TranslaasOptions`:
+
+```java
+TranslaasOptions options = TranslaasOptions.builder()
+    .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+    .baseUrl("https://api.mantelabs.io")
+    .build();
+```
+
+## Framework integration
+
+Typical JVM integrations:
+
+- **Spring Boot** — `@Bean` for `TranslaasClient` / `TranslaasService`, inject into controllers and `@Scheduled` jobs
+- **Jakarta EE / Quarkus / Micronaut** — CDI producers or framework-specific config
+- **Android** — Only if the SDK’s Android policy and dependencies are supported; prefer a dedicated Android artifact if one is published
+
+Exact starter modules or BOMs will be listed here when available.
+
+## Examples
+
+Sample projects may live under `examples/` (not always tracked). If present:
+
+```bash
+cd examples/basic
+./mvnw exec:java -Dexec.mainClass="com.example.Main"
+```
+
+Adjust module layout and commands to match the repository once examples are added.
+
+## License
+
+This project is licensed under the MIT License — see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+- **Website**: [https://mantelabs.io](https://mantelabs.io)
+- **Issues**: [https://github.com/Mantelabs/translaas-sdk-java/issues](https://github.com/Mantelabs/translaas-sdk-java/issues)
+- **Documentation**: published on [mantelabs.io](https://mantelabs.io) when available
+
+## Contributing
+
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) when available for workflow, style, and review expectations.
+
+---
+
+Made for the JVM ecosystem.
