@@ -253,13 +253,7 @@ cd translaas-sdk-java
 ./mvnw -q verify
 ```
 
-Or with Gradle:
-
-```bash
-./gradlew build
-```
-
-Use the wrapper script committed in the repository (`mvnw` / `gradlew`) so the toolchain version stays consistent in CI and locally.
+The repository is **Maven-first**: use the committed wrapper (`mvnw` / `mvnw.cmd`) so CI and local builds stay aligned. Module layout and commands are summarized in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ### Run tests
 
@@ -336,7 +330,7 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ## Contributing
 
-Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) when available for workflow, style, and review expectations.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for workflow, style, and review expectations.
 
 ---
 
