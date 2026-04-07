@@ -49,7 +49,7 @@ jobs:
 
       - name: Upload JaCoCo reports (if present)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-ubuntu-jdk-${{ matrix.java-version }}
           path: |
@@ -98,7 +98,7 @@ jobs:
 
       - name: Upload JaCoCo reports (if present)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-windows-jdk-17
           path: |
@@ -139,7 +139,7 @@ jobs:
 
       - name: Upload JaCoCo reports (if present)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: jacoco-macos-jdk-17
           path: |
