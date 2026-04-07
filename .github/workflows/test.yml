@@ -1,0 +1,66 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**/src/**/*.java'
+      - '**/pom.xml'
+      - '.github/workflows/test.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - '**/src/**/*.java'
+      - '**/pom.xml'
+      - '.github/workflows/test.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    name: Unit tests (JDK ${{ matrix.java-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        java-version: ['11', '17', '21']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK ${{ matrix.java-version }}
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java-version }}
+          cache: 'maven'
+
+      - name: Build and test
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -f ./mvnw ]]; then
+            chmod +x ./mvnw
+            ./mvnw -B -ntp verify
+          elif command -v mvn >/dev/null 2>&1; then
+            mvn -B -ntp verify
+          else
+            echo "Add the Maven Wrapper (mvn -N wrapper:wrapper) or install Maven."
+            exit 1
+          fi
+
+      - name: Upload coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: |
+            **/target/site/jacoco/jacoco.xml
+          flags: unit
+          fail_ci_if_error: false

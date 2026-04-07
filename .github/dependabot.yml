@@ -1,0 +1,31 @@
+version: 2
+updates:
+  # Maven dependencies (root POM or BOM at repository root)
+  - package-ecosystem: 'maven'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    open-pull-requests-limit: 10
+    labels:
+      - 'dependencies'
+      - 'automated'
+    commit-message:
+      prefix: 'chore'
+      include: 'scope'
+    groups:
+      test:
+        patterns:
+          - 'org.junit*'
+          - 'org.mockito*'
+          - 'org.assertj*'
+      jackson:
+        patterns:
+          - 'com.fasterxml.jackson*'
+
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+    labels:
+      - 'github-actions'
+      - 'automated'

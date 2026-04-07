@@ -1,0 +1,39 @@
+# Configures "Generate release notes" on GitHub Releases.
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+#
+# For hand-written, narrative notes (overview, install, migration), copy from:
+# .github/RELEASE_NOTES_TEMPLATE.md — GitHub does not auto-fill the release body from that file.
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-release
+      - skip-changelog
+    authors:
+      - dependabot[bot]
+      - github-actions[bot]
+  categories:
+    - title: ⚠️ Breaking changes
+      labels:
+        - breaking
+        - semver-major
+    - title: ✨ Features
+      labels:
+        - feature
+        - enhancement
+        - semver-minor
+    - title: 🐛 Fixes
+      labels:
+        - bug
+        - fix
+    - title: 📦 Dependencies
+      labels:
+        - dependencies
+        - github-actions
+    - title: 📚 Documentation
+      labels:
+        - documentation
+        - docs
+    - title: 🔧 Other changes
+      labels:
+        - '*'
