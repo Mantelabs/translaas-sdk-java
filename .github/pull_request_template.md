@@ -5,15 +5,9 @@
 
 ### Changes
 
-#### Backend
-- [ ] [Backend change 1]
-- [ ] [Backend change 2]
-- [ ] [Backend change 3]
-
-#### Frontend
-- [ ] [Frontend change 1]
-- [ ] [Frontend change 2]
-- [ ] [Frontend change 3]
+- [ ] [Change 1]
+- [ ] [Change 2]
+- [ ] [Change 3]
 
 ### Technical Notes
 - [Any relevant technical context, constraints, or considerations]
