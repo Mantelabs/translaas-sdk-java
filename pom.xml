@@ -29,6 +29,7 @@
     <assertj.version>3.26.3</assertj.version>
     <jacoco.version>0.8.12</jacoco.version>
     <jackson.version>2.18.2</jackson.version>
+    <wiremock.version>3.10.0</wiremock.version>
   </properties>
 
   <dependencyManagement>
@@ -82,6 +83,12 @@
         <groupId>org.assertj</groupId>
         <artifactId>assertj-core</artifactId>
         <version>${assertj.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.wiremock</groupId>
+        <artifactId>wiremock</artifactId>
+        <version>${wiremock.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
