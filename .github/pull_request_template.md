@@ -1,5 +1,3 @@
-## [Feature/Bug Fix/Refactor] Brief Description
-
 ### Summary
 [Provide a clear and concise summary of what this PR does]
 
