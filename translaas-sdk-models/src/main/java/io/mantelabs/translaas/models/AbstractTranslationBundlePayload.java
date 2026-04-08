@@ -5,9 +5,8 @@ import java.time.Instant;
 import java.util.Map;
 
 /**
- * Shared fields for group- and project-scoped translation bundle JSON (OpenAPI
- * {@code GetGroupTranslationsResponse}; project route is not yet modeled separately in
- * {@code api-specs.json} but matches this shape at runtime).
+ * Shared fields for group-scoped translation bundle JSON (OpenAPI {@code
+ * GetGroupTranslationsResponse}).
  */
 abstract class AbstractTranslationBundlePayload {
 
@@ -17,6 +16,7 @@ abstract class AbstractTranslationBundlePayload {
   private final Instant generatedAt;
   private final Map<String, JsonNode> entries;
   private final Map<String, Map<String, String>> entryContext;
+  private final Map<String, Map<String, String>> groupEntryContext;
 
   protected AbstractTranslationBundlePayload(
       String project,
@@ -24,13 +24,15 @@ abstract class AbstractTranslationBundlePayload {
       int version,
       Instant generatedAt,
       Map<String, JsonNode> entries,
-      Map<String, Map<String, String>> entryContext) {
+      Map<String, Map<String, String>> entryContext,
+      Map<String, Map<String, String>> groupEntryContext) {
     this.project = project;
     this.lang = lang;
     this.version = version;
     this.generatedAt = generatedAt;
     this.entries = entries;
     this.entryContext = entryContext;
+    this.groupEntryContext = groupEntryContext;
   }
 
   /** @return project key from the response */
@@ -65,5 +67,13 @@ abstract class AbstractTranslationBundlePayload {
    */
   public Map<String, Map<String, String>> getEntryContext() {
     return entryContext;
+  }
+
+  /**
+   * @return optional group-level entry context (when {@code includeContext} is enabled), or {@code
+   *     null} if absent
+   */
+  public Map<String, Map<String, String>> getGroupEntryContext() {
+    return groupEntryContext;
   }
 }
