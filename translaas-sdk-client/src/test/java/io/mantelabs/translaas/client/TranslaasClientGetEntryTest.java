@@ -11,7 +11,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.mantelabs.translaas.models.exception.TranslaasApiException;
 import java.math.BigDecimal;
-import java.net.URI;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 
@@ -112,7 +111,7 @@ class TranslaasClientGetEntryTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl(URI.create("http://localhost:" + wm.getHttpPort()))
+            .baseUrl(TestApiUrls.httpOrigin(wm.getHttpPort()))
             .useConditionalRequests(true)
             .build();
     TranslaasClient client = new TranslaasClient(options);
@@ -130,7 +129,7 @@ class TranslaasClientGetEntryTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("test-key")
-            .baseUrl(URI.create("http://localhost:" + port))
+            .baseUrl(TestApiUrls.httpOrigin(port))
             .build();
     return new TranslaasClient(options);
   }
