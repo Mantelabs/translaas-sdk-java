@@ -170,6 +170,49 @@ TranslaasOptions options = TranslaasOptions.builder()
 
 Exact types (`Duration`, enums, builders) follow the published Javadoc.
 
+### File and hybrid cache (`translaas-sdk-caching-file`)
+
+Use a disk-backed `FileCacheProvider` for offline-friendly persistence, or `HybridCacheProvider` for L1 memory plus L2 file with promotion on L2 hits:
+
+```java
+import io.mantelabs.translaas.caching.MemoryTranslaasCacheOptions;
+import io.mantelabs.translaas.caching.TranslaasCacheEntry;
+import io.mantelabs.translaas.caching.file.FileCacheProvider;
+import io.mantelabs.translaas.caching.file.HybridCacheProvider;
+import io.mantelabs.translaas.caching.file.HybridCacheOptions;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+
+Path cacheRoot = Path.of(System.getProperty("java.io.tmpdir"), "translaas-cache");
+TranslaasCacheEntry sample =
+    new TranslaasCacheEntry("text".getBytes(StandardCharsets.UTF_8), null, null);
+
+FileCacheProvider fileOnly = new FileCacheProvider(cacheRoot);
+fileOnly.put("opaque-cache-key", sample);
+
+HybridCacheProvider hybrid =
+    new HybridCacheProvider(
+        cacheRoot,
+        HybridCacheOptions.builder()
+            .memory(MemoryTranslaasCacheOptions.lru(512))
+            .promoteL2HitsToL1(true)
+            .build());
+hybrid.put("opaque-cache-key", sample);
+```
+
+For cache-only or offline bootstrap, you can mark options so application code may skip API-key validation (the client does not validate on construction):
+
+```java
+import io.mantelabs.translaas.client.TranslaasOptions;
+
+TranslaasOptions offlineAware =
+    TranslaasOptions.builder()
+        .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+        .baseUrl("https://api.mantelabs.io")
+        .skipApiValidation(true)
+        .build();
+```
+
 ### Environment variables and system properties
 
 Typical mappings (names may match other Translaas SDKs):
