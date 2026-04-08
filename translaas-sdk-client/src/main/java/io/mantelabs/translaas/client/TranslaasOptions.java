@@ -30,6 +30,7 @@ public final class TranslaasOptions {
   private final String snapshotVersion;
   private final Boolean includeContextDefault;
   private final boolean useConditionalRequests;
+  private final boolean skipApiValidation;
   private final String apiKeyHeader;
 
   public String getApiKey() {
@@ -87,6 +88,15 @@ public final class TranslaasOptions {
     return useConditionalRequests;
   }
 
+  /**
+   * When {@code true}, higher-level bootstrap code may skip {@link TranslaasClient#validateApiKey()}
+   * (for example offline-only or cache-only workflows). The HTTP client does not call validate
+   * automatically; this flag exists for parity with other SDKs and future service integration.
+   */
+  public boolean isSkipApiValidation() {
+    return skipApiValidation;
+  }
+
   public String getApiKeyHeader() {
     return apiKeyHeader;
   }
@@ -110,6 +120,7 @@ public final class TranslaasOptions {
     private String snapshotVersion;
     private Boolean includeContextDefault;
     private boolean useConditionalRequests = true;
+    private boolean skipApiValidation;
     private String apiKeyHeader;
 
     private Builder() {}
@@ -179,6 +190,11 @@ public final class TranslaasOptions {
       return this;
     }
 
+    public Builder skipApiValidation(boolean skipApiValidation) {
+      this.skipApiValidation = skipApiValidation;
+      return this;
+    }
+
     public Builder apiKeyHeader(String apiKeyHeader) {
       this.apiKeyHeader = apiKeyHeader;
       return this;
@@ -209,6 +225,7 @@ public final class TranslaasOptions {
     this.snapshotVersion = builder.snapshotVersion;
     this.includeContextDefault = builder.includeContextDefault;
     this.useConditionalRequests = builder.useConditionalRequests;
+    this.skipApiValidation = builder.skipApiValidation;
     this.apiKeyHeader = builder.apiKeyHeader != null ? builder.apiKeyHeader : DEFAULT_API_KEY_HEADER;
   }
 }
