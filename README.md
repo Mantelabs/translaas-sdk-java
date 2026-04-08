@@ -257,9 +257,49 @@ TranslaasOptions options = TranslaasOptions.builder()
     .build();
 ```
 
-On Java you can also layer **Spring Boot** `application.properties` / YAML, **Micronaut**, or **Quarkus** config, mapping keys into `TranslaasOptions` in `@Configuration` beans.
+On Java you can also layer **Micronaut** or **Quarkus** config, mapping keys into `TranslaasOptions` in `@Configuration` beans, or use the optional Spring Boot starter described below.
 
 Keep secrets out of source control; use env vars, vaults, or your platform’s secret store.
+
+## Framework integration
+
+### Spring Boot (optional starter)
+
+Add **`translaas-sdk-spring-boot-starter`** alongside **`spring-boot-starter`** (or **`spring-boot-starter-web`**) in your application. The starter registers **`TranslaasClient`**, **`TranslaasService`**, and **`TranslaasProperties`** bound from `translaas.*` (see table below). Auto-configuration is registered for **Spring Boot 2.x** (`META-INF/spring.factories`) and **Spring Boot 3.x** (`META-INF/spring/org.springframework.boot.autoconfigure.AutoConfiguration.imports`). The starter is built against **Spring Boot 2.7** and **Java 11**; it is expected to work on **Spring Boot 3** applications on **JDK 17+** as well.
+
+**Maven**
+
+```xml
+<dependency>
+  <groupId>io.mantelabs</groupId>
+  <artifactId>translaas-sdk-spring-boot-starter</artifactId>
+  <version>x.y.z</version><!-- align with other io.mantelabs artifacts -->
+</dependency>
+```
+
+**Minimal `application.yml`**
+
+```yaml
+translaas:
+  api-key: ${TRANSLAAS_API_KEY}
+  base-url: https://api.mantelabs.io
+```
+
+Required keys match programmatic **`TranslaasOptions`**: `api-key` and `base-url`. Other settings use the same names as in the **Configuration options** table under [Configuration](#configuration) (kebab-case in YAML), for example `cache-mode`, `default-language`, `timeout`, `channel`, `skip-api-validation`.
+
+**Optional behaviors**
+
+| Property | Effect |
+| -------- | ------ |
+| `translaas.enabled` | When `false`, skips auto-configuration (default `true`). |
+| `translaas.caching.memory.enabled` | Registers a **`MemoryTranslaasCacheProvider`** bean (if you did not define your own **`TranslaasCacheProvider`**), with optional `translaas.caching.memory.lru-max-entries`. |
+| `translaas.locale.use-spring-locale-context` | Registers a **`LanguageResolver`** that uses Spring’s **`LocaleContextHolder`** (request locale in Spring MVC). |
+
+Disable or replace beans by defining your own **`TranslaasClient`**, **`TranslaasService`**, or **`io.mantelabs.translaas.TranslaasOptions`** bean where needed.
+
+### Other JVM frameworks
+
+Without the starter, you can expose **`TranslaasClient`** / **`TranslaasService`** as **`@Bean`** methods from **`@Configuration`** (for example in Spring Boot), or use **CDI** producers on **Jakarta EE**, **Quarkus**, or **Micronaut**. **Android** is only appropriate if the SDK’s Android policy and dependencies match your app; prefer a dedicated Android artifact if one is published.
 
 ## Usage examples
 
@@ -374,16 +414,6 @@ TranslaasOptions options = TranslaasOptions.builder()
     .baseUrl("https://api.mantelabs.io")
     .build();
 ```
-
-## Framework integration
-
-Typical JVM integrations:
-
-- **Spring Boot** — `@Bean` for `TranslaasClient` / `TranslaasService`, inject into controllers and `@Scheduled` jobs
-- **Jakarta EE / Quarkus / Micronaut** — CDI producers or framework-specific config
-- **Android** — Only if the SDK’s Android policy and dependencies are supported; prefer a dedicated Android artifact if one is published
-
-Exact starter modules or BOMs will be listed here when available.
 
 ## Examples
 
