@@ -41,6 +41,10 @@ public final class TranslaasHttp {
     this.httpInvoker = Objects.requireNonNull(httpInvoker, "httpInvoker");
   }
 
+  public TranslaasOptions getOptions() {
+    return options;
+  }
+
   private static HttpClient newClient(TranslaasOptions options) {
     HttpClient.Builder b = HttpClient.newBuilder();
     Duration timeout = options.getTimeout();
