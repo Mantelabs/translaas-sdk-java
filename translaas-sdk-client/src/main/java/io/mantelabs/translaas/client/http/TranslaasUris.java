@@ -62,7 +62,8 @@ public final class TranslaasUris {
     }
   }
 
-  static String buildQueryString(Map<String, String> queryParams) {
+  /** UTF-8 query string for URI building and stable cache keys. */
+  public static String buildQueryString(Map<String, String> queryParams) {
     StringBuilder q = new StringBuilder();
     for (Map.Entry<String, String> e : queryParams.entrySet()) {
       if (e.getKey() == null || e.getValue() == null) {
