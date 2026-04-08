@@ -15,6 +15,11 @@
   <name>Translaas SDK Client</name>
   <description>HTTP client and JSON mapping for the Translaas API</description>
 
+  <properties>
+    <!-- JaCoCo gate for this module only (line coverage on bundle); raise as coverage improves. -->
+    <translaas.jacoco.client.line.minimum>0.75</translaas.jacoco.client.line.minimum>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.mantelabs</groupId>
@@ -46,4 +51,35 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>jacoco-check</id>
+            <goals>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>LINE</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>${translaas.jacoco.client.line.minimum}</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

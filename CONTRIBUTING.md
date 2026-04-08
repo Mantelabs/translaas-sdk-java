@@ -29,8 +29,17 @@ Use the **Maven Wrapper** (`mvnw` / `mvnw.cmd`) so the build matches CI and you 
 
 ## Tests and coverage
 
-- Unit tests use **JUnit 5**, **AssertJ**, and **Mockito** where needed.
-- **`./mvnw verify`** runs tests and generates **JaCoCo** HTML/XML under each module’s `target/site/jacoco/` when applicable.
+- Unit tests use **JUnit 5**, **AssertJ**, and **Mockito** where needed. HTTP-level tests in `translaas-sdk-client` use **WireMock** (`@WireMockTest`) for request/response shaping without a real backend.
+- **`./mvnw verify`** runs unit tests, enforces a **JaCoCo line-coverage minimum** on `translaas-sdk-client`, and generates JaCoCo HTML/XML under each module’s `target/site/jacoco/` (except modules that skip JaCoCo).
+- **Optional live integration tests** (real Translaas API): set environment variables **`TRANSLAAS_BASE_URL`** (API origin, e.g. `https://your-tenant.translaas.io`) and **`TRANSLAAS_API_KEY`** (project-scoped key). Never put secrets in source control. Then run:
+  ```bash
+  export TRANSLAAS_BASE_URL="https://..."
+  export TRANSLAAS_API_KEY="..."
+  ./mvnw -Pintegration verify -pl translaas-sdk-client-integration-tests -am
+  ```
+  On PowerShell, set `$env:TRANSLAAS_BASE_URL` and `$env:TRANSLAAS_API_KEY` instead of `export`.
+  If those variables are unset, the live test class is skipped and the build still succeeds. In **GitHub Actions**, use repository secrets with the same names and run the **Integration tests** workflow manually (`.github/workflows/integration-tests.yml`).
+- User-facing release notes for maintainers: see **`CHANGELOG.md`** and [`.github/RELEASE_NOTES_TEMPLATE.md`](.github/RELEASE_NOTES_TEMPLATE.md).
 
 ## Pull requests
 
