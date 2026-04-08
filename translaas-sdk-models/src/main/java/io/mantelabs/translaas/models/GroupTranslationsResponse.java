@@ -19,6 +19,7 @@ public final class GroupTranslationsResponse extends AbstractTranslationBundlePa
    * @param generatedAt generation timestamp
    * @param entries translation entries (values may be strings or structured plural payloads)
    * @param entryContext optional per-entry context maps, or {@code null}
+   * @param groupEntryContext optional group-scoped context map, or {@code null}
    */
   @JsonCreator
   public GroupTranslationsResponse(
@@ -27,7 +28,8 @@ public final class GroupTranslationsResponse extends AbstractTranslationBundlePa
       @JsonProperty("version") int version,
       @JsonProperty("generatedAt") Instant generatedAt,
       @JsonProperty("entries") Map<String, JsonNode> entries,
-      @JsonProperty("entryContext") Map<String, Map<String, String>> entryContext) {
-    super(project, lang, version, generatedAt, entries, entryContext);
+      @JsonProperty("entryContext") Map<String, Map<String, String>> entryContext,
+      @JsonProperty("groupEntryContext") Map<String, Map<String, String>> groupEntryContext) {
+    super(project, lang, version, generatedAt, entries, entryContext, groupEntryContext);
   }
 }
