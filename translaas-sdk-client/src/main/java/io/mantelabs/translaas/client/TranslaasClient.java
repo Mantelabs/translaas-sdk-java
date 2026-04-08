@@ -6,6 +6,7 @@ import io.mantelabs.translaas.models.GroupTranslationsResponse;
 import io.mantelabs.translaas.models.ProjectLocalesResponse;
 import io.mantelabs.translaas.models.ProjectTranslationsResponse;
 import io.mantelabs.translaas.models.ReportMissingKeysRequest;
+import io.mantelabs.translaas.models.ValidateApiKeyResponse;
 import io.mantelabs.translaas.models.exception.TranslaasApiException;
 import io.mantelabs.translaas.models.json.TranslaasJson;
 import java.io.IOException;
@@ -36,6 +37,9 @@ import java.util.concurrent.ForkJoinPool;
  * with {@code null} and {@link TranslaasRequestContext#isNotModified()} is {@code true} when a
  * context instance was provided.
  *
+ * <p>Validate API key (connectivity / bootstrap): {@link #validateApiKey()} — {@code GET}
+ * {@value #API_KEYS_VALIDATE_PATH} ({@code application/json}).
+ *
  * <p>Missing keys: {@link #reportMissingKeys(ReportMissingKeysRequest, TranslaasRequestContext,
  * Executor)} — {@code POST} JSON; expects {@code 202 Accepted}. Requires a project-scoped API key
  * (see {@link #reportMissingKeys(ReportMissingKeysRequest, TranslaasRequestContext, Executor)}).
@@ -58,6 +62,9 @@ public final class TranslaasClient {
 
   /** Path for {@code POST} report missing keys as {@code application/json}. */
   public static final String TRANSLATIONS_REPORT_MISSING_PATH = "/sdk/v1/translations/report-missing";
+
+  /** Path for {@code GET} validate API key as {@code application/json} (not under {@code /sdk}). */
+  public static final String API_KEYS_VALIDATE_PATH = "/api/v1/api-keys/validate";
 
   /**
    * Value for the {@code format} query parameter to request composite-key flat bundles ({@code
@@ -372,6 +379,55 @@ public final class TranslaasClient {
           response.statusCode(),
           snippet(body),
           "Failed to parse project translations JSON: " + response.uri(),
+          e);
+    }
+  }
+
+  /**
+   * Validates the configured API key ({@code GET} {@value #API_KEYS_VALIDATE_PATH},
+   * {@code application/json}). Used for connectivity and bootstrap checks.
+   *
+   * <p>Uses the same {@link TranslaasOptions#getApiKeyHeader() API key header} as other calls.
+   */
+  public CompletableFuture<ValidateApiKeyResponse> validateApiKey() {
+    return validateApiKey(null, null);
+  }
+
+  /**
+   * Same as {@link #validateApiKey()} with optional per-request context (e.g. conditional headers
+   * when {@link TranslaasOptions#isUseConditionalRequests()} is true).
+   */
+  public CompletableFuture<ValidateApiKeyResponse> validateApiKey(TranslaasRequestContext context) {
+    return validateApiKey(context, null);
+  }
+
+  /**
+   * @param executor optional executor for the async task; defaults to the common pool
+   */
+  public CompletableFuture<ValidateApiKeyResponse> validateApiKey(
+      TranslaasRequestContext context, Executor executor) {
+    Executor exec = executor != null ? executor : ForkJoinPool.commonPool();
+    return CompletableFuture.supplyAsync(() -> validateApiKeyBlocking(context), exec);
+  }
+
+  private ValidateApiKeyResponse validateApiKeyBlocking(TranslaasRequestContext context)
+      throws TranslaasApiException {
+    if (context != null) {
+      context.clearResponseMetadata();
+    }
+    HttpResponse<String> response = http.get(API_KEYS_VALIDATE_PATH, null, context);
+    if (response.statusCode() == 304) {
+      return null;
+    }
+    String body = response.body();
+    try {
+      return TranslaasJson.mapper()
+          .readValue(body != null ? body : "", ValidateApiKeyResponse.class);
+    } catch (IOException e) {
+      throw new TranslaasApiException(
+          response.statusCode(),
+          snippet(body),
+          "Failed to parse validate API key JSON: " + response.uri(),
           e);
     }
   }
