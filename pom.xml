@@ -18,6 +18,7 @@
     <module>translaas-sdk-caching</module>
     <module>translaas-sdk-caching-file</module>
     <module>translaas-sdk</module>
+    <module>translaas-sdk-spring-boot-starter</module>
   </modules>
 
   <properties>
@@ -59,6 +60,16 @@
       <dependency>
         <groupId>io.mantelabs</groupId>
         <artifactId>translaas-sdk-caching-file</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.mantelabs</groupId>
+        <artifactId>translaas-sdk</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.mantelabs</groupId>
+        <artifactId>translaas-sdk-spring-boot-starter</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
