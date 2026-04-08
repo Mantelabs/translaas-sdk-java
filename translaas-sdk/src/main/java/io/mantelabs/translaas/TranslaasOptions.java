@@ -1,5 +1,6 @@
 package io.mantelabs.translaas;
 
+import io.mantelabs.translaas.caching.TranslaasCacheProvider;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Objects;
@@ -111,6 +112,11 @@ public final class TranslaasOptions {
 
     public Builder apiKeyHeader(String apiKeyHeader) {
       inner.apiKeyHeader(apiKeyHeader);
+      return this;
+    }
+
+    public Builder cacheProvider(TranslaasCacheProvider cacheProvider) {
+      inner.cacheProvider(cacheProvider);
       return this;
     }
 

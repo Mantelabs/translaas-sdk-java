@@ -1,5 +1,6 @@
 package io.mantelabs.translaas.client;
 
+import io.mantelabs.translaas.caching.TranslaasCacheProvider;
 import io.mantelabs.translaas.client.http.TranslaasUris;
 import io.mantelabs.translaas.models.exception.TranslaasConfigurationException;
 import java.net.URI;
@@ -32,6 +33,7 @@ public final class TranslaasOptions {
   private final boolean useConditionalRequests;
   private final boolean skipApiValidation;
   private final String apiKeyHeader;
+  private final TranslaasCacheProvider cacheProvider;
 
   public String getApiKey() {
     return apiKey;
@@ -101,6 +103,14 @@ public final class TranslaasOptions {
     return apiKeyHeader;
   }
 
+  /**
+   * Optional custom cache store; when empty and {@link #getCacheMode()} is not {@link
+   * CacheMode#NONE}, the client uses {@link io.mantelabs.translaas.caching.MemoryTranslaasCacheProvider}.
+   */
+  public Optional<TranslaasCacheProvider> getCacheProvider() {
+    return Optional.ofNullable(cacheProvider);
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -122,6 +132,7 @@ public final class TranslaasOptions {
     private boolean useConditionalRequests = true;
     private boolean skipApiValidation;
     private String apiKeyHeader;
+    private TranslaasCacheProvider cacheProvider;
 
     private Builder() {}
 
@@ -150,11 +161,19 @@ public final class TranslaasOptions {
       return this;
     }
 
+    /**
+     * Absolute expiry from entry creation. When set, {@link #cacheSlidingExpiration(Duration)} does
+     * not extend lifetime on cache hits.
+     */
     public Builder cacheAbsoluteExpiration(Duration cacheAbsoluteExpiration) {
       this.cacheAbsoluteExpiration = cacheAbsoluteExpiration;
       return this;
     }
 
+    /**
+     * Sliding expiry: refreshed on each successful cache read when no absolute expiration is
+     * configured.
+     */
     public Builder cacheSlidingExpiration(Duration cacheSlidingExpiration) {
       this.cacheSlidingExpiration = cacheSlidingExpiration;
       return this;
@@ -200,6 +219,11 @@ public final class TranslaasOptions {
       return this;
     }
 
+    public Builder cacheProvider(TranslaasCacheProvider cacheProvider) {
+      this.cacheProvider = cacheProvider;
+      return this;
+    }
+
     public TranslaasOptions build() {
       if (apiKey == null || apiKey.isBlank()) {
         throw new TranslaasConfigurationException("apiKey is required");
@@ -227,5 +251,6 @@ public final class TranslaasOptions {
     this.useConditionalRequests = builder.useConditionalRequests;
     this.skipApiValidation = builder.skipApiValidation;
     this.apiKeyHeader = builder.apiKeyHeader != null ? builder.apiKeyHeader : DEFAULT_API_KEY_HEADER;
+    this.cacheProvider = builder.cacheProvider;
   }
 }
