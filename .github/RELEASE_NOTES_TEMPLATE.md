@@ -50,8 +50,8 @@ dependencies {
 - Reference packages: `io.mantelabs.translaas.client`, `io.mantelabs.translaas.config`, etc.
 
 ```java
-import io.mantelabs.translaas.TranslaasClient;
-import io.mantelabs.translaas.TranslaasOptions;
+import io.mantelabs.translaas.client.TranslaasClient;
+import io.mantelabs.translaas.client.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
