@@ -56,12 +56,31 @@ public final class TranslaasHttp {
   public HttpResponse<String> get(
       String path, Map<String, String> query, TranslaasRequestContext context)
       throws TranslaasApiException {
+    return get(path, query, context, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+  }
+
+  /**
+   * GET request with a binary body (e.g. {@code application/zip}): same query merge and headers as
+   * {@link #get(String, Map, TranslaasRequestContext)}.
+   */
+  public HttpResponse<byte[]> getBytes(
+      String path, Map<String, String> query, TranslaasRequestContext context)
+      throws TranslaasApiException {
+    return get(path, query, context, HttpResponse.BodyHandlers.ofByteArray());
+  }
+
+  private <T> HttpResponse<T> get(
+      String path,
+      Map<String, String> query,
+      TranslaasRequestContext context,
+      HttpResponse.BodyHandler<T> bodyHandler)
+      throws TranslaasApiException {
     LinkedHashMap<String, String> merged =
         TranslaasUris.mergeQueryParams(options, context, query);
     URI uri = TranslaasUris.buildUri(options.getBaseUrl(), path, merged);
     HttpRequest.Builder b = HttpRequest.newBuilder(uri).GET();
     applyHeaderPairs(b, collectHeaders(context));
-    return sendRequest(b, context);
+    return sendRequest(b, context, bodyHandler);
   }
 
   /**
@@ -84,23 +103,26 @@ public final class TranslaasHttp {
             .POST(HttpRequest.BodyPublishers.ofString(body == null ? "" : body, StandardCharsets.UTF_8))
             .header("Content-Type", ct);
     applyHeaderPairs(b, collectHeaders(context));
-    return sendRequest(b, context);
+    return sendRequest(b, context, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
   }
 
-  private HttpResponse<String> sendRequest(HttpRequest.Builder requestBuilder, TranslaasRequestContext context)
+  private <T> HttpResponse<T> sendRequest(
+      HttpRequest.Builder requestBuilder,
+      TranslaasRequestContext context,
+      HttpResponse.BodyHandler<T> bodyHandler)
       throws TranslaasApiException {
     Duration timeout = options.getTimeout();
     if (timeout != null) {
       requestBuilder.timeout(timeout);
     }
-    return send(requestBuilder.build(), context);
+    return send(requestBuilder.build(), context, bodyHandler);
   }
 
-  private HttpResponse<String> send(HttpRequest request, TranslaasRequestContext context)
+  private <T> HttpResponse<T> send(
+      HttpRequest request, TranslaasRequestContext context, HttpResponse.BodyHandler<T> bodyHandler)
       throws TranslaasApiException {
     try {
-      HttpResponse<String> response =
-          httpInvoker.send(request, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+      HttpResponse<T> response = httpInvoker.send(request, bodyHandler);
       applyResponseMetadata(response, context);
       if (response.statusCode() == 304) {
         return response;
@@ -108,7 +130,7 @@ public final class TranslaasHttp {
       if (response.statusCode() >= 400) {
         throw new TranslaasApiException(
             response.statusCode(),
-            snippet(response.body()),
+            errorBodySnippet(response.body()),
             "HTTP " + response.statusCode() + " " + response.uri());
       }
       return response;
@@ -120,7 +142,7 @@ public final class TranslaasHttp {
     }
   }
 
-  private void applyResponseMetadata(HttpResponse<String> response, TranslaasRequestContext context) {
+  private void applyResponseMetadata(HttpResponse<?> response, TranslaasRequestContext context) {
     if (context == null) {
       return;
     }
@@ -159,5 +181,18 @@ public final class TranslaasHttp {
       return null;
     }
     return body.length() > BODY_SNIPPET_MAX ? body.substring(0, BODY_SNIPPET_MAX) : body;
+  }
+
+  private static String errorBodySnippet(Object body) {
+    if (body == null) {
+      return null;
+    }
+    if (body instanceof String) {
+      return snippet((String) body);
+    }
+    if (body instanceof byte[]) {
+      return snippet(new String((byte[]) body, StandardCharsets.UTF_8));
+    }
+    return null;
   }
 }
