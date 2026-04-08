@@ -3,6 +3,7 @@ package io.mantelabs.translaas.client;
 import io.mantelabs.translaas.client.http.TranslaasHttp;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mantelabs.translaas.models.GroupTranslationsResponse;
+import io.mantelabs.translaas.models.OfflineCacheDownloadResult;
 import io.mantelabs.translaas.models.ProjectLocalesResponse;
 import io.mantelabs.translaas.models.ProjectTranslationsResponse;
 import io.mantelabs.translaas.models.ReportMissingKeysRequest;
@@ -43,6 +44,11 @@ import java.util.concurrent.ForkJoinPool;
  * <p>Missing keys: {@link #reportMissingKeys(ReportMissingKeysRequest, TranslaasRequestContext,
  * Executor)} — {@code POST} JSON; expects {@code 202 Accepted}. Requires a project-scoped API key
  * (see {@link #reportMissingKeys(ReportMissingKeysRequest, TranslaasRequestContext, Executor)}).
+ *
+ * <p>Offline cache ZIP: {@link #getOfflineCache(String, TranslaasRequestContext, Executor)} —
+ * {@code GET} {@value #TRANSLATIONS_OFFLINE_CACHE_PATH} ({@code application/zip}). On {@code 304
+ * Not Modified}, completes with {@code null} and {@link TranslaasRequestContext#isNotModified()} is
+ * {@code true} when a context instance was provided.
  */
 public final class TranslaasClient {
 
@@ -62,6 +68,9 @@ public final class TranslaasClient {
 
   /** Path for {@code POST} report missing keys as {@code application/json}. */
   public static final String TRANSLATIONS_REPORT_MISSING_PATH = "/sdk/v1/translations/report-missing";
+
+  /** Path for {@code GET} offline translation cache as {@code application/zip}. */
+  public static final String TRANSLATIONS_OFFLINE_CACHE_PATH = "/sdk/v1/translations/offline-cache";
 
   /** Path for {@code GET} validate API key as {@code application/json} (not under {@code /sdk}). */
   public static final String API_KEYS_VALIDATE_PATH = "/api/v1/api-keys/validate";
@@ -476,6 +485,63 @@ public final class TranslaasClient {
       throw new TranslaasApiException(0, null, "Failed to serialize report-missing request body", e);
     }
     http.post(TRANSLATIONS_REPORT_MISSING_PATH, null, json, null, context);
+  }
+
+  /**
+   * Downloads the offline translation cache as a ZIP ({@code application/zip}).
+   *
+   * <p>Query parameters: required {@code project}; optional {@code channel}, {@code v}, {@code
+   * includeContext} from {@link TranslaasOptions} defaults and {@link TranslaasRequestContext}
+   * overrides.
+   *
+   * <p>The returned {@link OfflineCacheDownloadResult#getZipBytes()} array is owned by the result;
+   * callers may retain it as long as they retain the result instance.
+   *
+   * @param project required project key
+   * @return ZIP bytes and optional {@code Content-Disposition} filename, or {@code null} when the
+   *     server returns {@code 304} (see {@link TranslaasRequestContext#isNotModified()})
+   */
+  public CompletableFuture<OfflineCacheDownloadResult> getOfflineCache(String project) {
+    return getOfflineCache(project, null, null);
+  }
+
+  /**
+   * Same as {@link #getOfflineCache(String)} with optional per-request context (conditional GET via
+   * {@link TranslaasRequestContext#setIfNoneMatch(String)} when {@link
+   * TranslaasOptions#isUseConditionalRequests()} is true).
+   */
+  public CompletableFuture<OfflineCacheDownloadResult> getOfflineCache(
+      String project, TranslaasRequestContext context) {
+    return getOfflineCache(project, context, null);
+  }
+
+  /**
+   * @param executor optional executor for the async task; defaults to the common pool
+   */
+  public CompletableFuture<OfflineCacheDownloadResult> getOfflineCache(
+      String project, TranslaasRequestContext context, Executor executor) {
+    Executor exec = executor != null ? executor : ForkJoinPool.commonPool();
+    return CompletableFuture.supplyAsync(() -> getOfflineCacheBlocking(project, context), exec);
+  }
+
+  private OfflineCacheDownloadResult getOfflineCacheBlocking(
+      String project, TranslaasRequestContext context) throws TranslaasApiException {
+    requireNonBlank(project, "project");
+    if (context != null) {
+      context.clearResponseMetadata();
+    }
+    LinkedHashMap<String, String> query = new LinkedHashMap<>();
+    query.put("project", project);
+    HttpResponse<byte[]> response =
+        http.getBytes(TRANSLATIONS_OFFLINE_CACHE_PATH, query, context);
+    if (response.statusCode() == 304) {
+      return null;
+    }
+    byte[] body = response.body();
+    String filename =
+        ContentDispositionFilenames.parseFilename(
+            response.headers().firstValue("Content-Disposition").orElse(null));
+    return new OfflineCacheDownloadResult(body != null ? body : new byte[0], filename);
   }
 
   private static void requireNonBlank(String value, String name) {
