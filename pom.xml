@@ -140,4 +140,13 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>integration</id>
+      <modules>
+        <module>translaas-sdk-client-integration-tests</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

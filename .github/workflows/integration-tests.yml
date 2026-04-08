@@ -1,0 +1,40 @@
+name: Integration tests
+
+# Optional live API checks. Configure repository secrets TRANSLAAS_BASE_URL and TRANSLAAS_API_KEY
+# (never commit API keys). Default branch builds do not require these secrets.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-api:
+    name: Live API (validate API key)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Run integration tests
+        env:
+          TRANSLAAS_BASE_URL: ${{ secrets.TRANSLAAS_BASE_URL }}
+          TRANSLAAS_API_KEY: ${{ secrets.TRANSLAAS_API_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${TRANSLAAS_BASE_URL:-}" || -z "${TRANSLAAS_API_KEY:-}" ]]; then
+            echo "Set repository secrets TRANSLAAS_BASE_URL and TRANSLAAS_API_KEY before running this workflow."
+            exit 1
+          fi
+          chmod +x ./mvnw
+          ./mvnw -B -ntp -Pintegration verify -pl translaas-sdk-client-integration-tests -am
