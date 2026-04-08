@@ -80,7 +80,18 @@ If a BOM is published for aligned versions:
 
 Use the Maven or Gradle snippet above with the current version from [Maven Central](https://central.sonatype.com/).
 
-### 2. Create a client
+### 2. Package layout (parity with other SDKs)
+
+The **`translaas-sdk`** artifact exposes two layers, similar to .NET’s `Translaas.Client` vs convenience/DI types:
+
+| Layer | Java package | Typical types |
+| ----- | ------------ | ------------- |
+| HTTP client | `io.mantelabs.translaas.client` | `TranslaasClient`, `TranslaasOptions` (client builder) |
+| Convenience API | `io.mantelabs.translaas` | `TranslaasService`, `TranslaasOptions` (facade builder), `CacheMode`, `LanguageCodes` |
+
+Use **`io.mantelabs.translaas.client.TranslaasOptions`** when constructing **`TranslaasClient`**. Use the facade **`io.mantelabs.translaas.TranslaasOptions`** with **`TranslaasService`** (it delegates to the client options internally).
+
+### 3. Create a client
 
 **Option A — `TranslaasService` (convenience lookups)**
 
@@ -112,8 +123,8 @@ var items = translaas.t("messages", "item", LanguageCodes.ENGLISH, 5).join();
 
 ```java
 import io.mantelabs.translaas.LanguageCodes;
-import io.mantelabs.translaas.TranslaasClient;
-import io.mantelabs.translaas.TranslaasOptions;
+import io.mantelabs.translaas.client.TranslaasClient;
+import io.mantelabs.translaas.client.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
@@ -122,16 +133,20 @@ TranslaasOptions options = TranslaasOptions.builder()
 
 TranslaasClient client = new TranslaasClient(options);
 
-var translation = client.getEntry("common", "welcome", "en").join();
+var translation = client.getEntry("common", "welcome", LanguageCodes.ENGLISH).join();
 ```
 
 Use blocking adapters if the SDK provides them (for example `getEntryBlocking`) in servlet-style code; prefer async APIs on structured concurrency or event-loop style runtimes when available.
 
 ## Configuration
 
+Samples below use the **`io.mantelabs.translaas`** facade for **`TranslaasService`**. For **`TranslaasClient`** only, build **`io.mantelabs.translaas.client.TranslaasOptions`** instead.
+
 ### Basic configuration
 
 ```java
+import io.mantelabs.translaas.TranslaasOptions;
+
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
     .baseUrl("https://api.mantelabs.io")
@@ -143,6 +158,11 @@ TranslaasService translaas = new TranslaasService(options);
 ### Advanced configuration
 
 ```java
+import io.mantelabs.translaas.CacheMode;
+import io.mantelabs.translaas.LanguageCodes;
+import io.mantelabs.translaas.TranslaasOptions;
+import java.time.Duration;
+
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
     .baseUrl("https://api.mantelabs.io")
@@ -226,6 +246,9 @@ export TRANSLAAS_DEFAULT_LANGUAGE=en
 ```
 
 ```java
+import io.mantelabs.translaas.CacheMode;
+import io.mantelabs.translaas.TranslaasOptions;
+
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
     .baseUrl(System.getenv().getOrDefault("TRANSLAAS_BASE_URL", "https://api.mantelabs.io"))
@@ -270,7 +293,17 @@ var withPlural = client.getEntry("messages", "item.count", LanguageCodes.ENGLISH
 
 ```java
 import io.mantelabs.translaas.LanguageCodes;
-import io.mantelabs.translaas.TranslaasApiException;
+import io.mantelabs.translaas.client.TranslaasClient;
+import io.mantelabs.translaas.client.TranslaasOptions;
+import io.mantelabs.translaas.models.exception.TranslaasApiException;
+
+// Example: client constructed from io.mantelabs.translaas.client.TranslaasOptions
+TranslaasClient client =
+    new TranslaasClient(
+        TranslaasOptions.builder()
+            .apiKey(System.getenv("TRANSLAAS_API_KEY"))
+            .baseUrl("https://api.mantelabs.io")
+            .build());
 
 try {
     var translation = client.getEntry("group", "entry", LanguageCodes.ENGLISH).join();
@@ -331,9 +364,11 @@ Translation routes use GET with query parameters except `report-missing` (JSON b
 
 ## Authentication
 
-Send the API key using the `X-Api-Key` header (as defined in the OpenAPI spec). Configure it when building `TranslaasOptions`:
+Send the API key using the `X-Api-Key` header (as defined in the OpenAPI spec). Configure it when building options (client or facade), for example:
 
 ```java
+import io.mantelabs.translaas.TranslaasOptions;
+
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
     .baseUrl("https://api.mantelabs.io")
