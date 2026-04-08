@@ -1,9 +1,11 @@
 package io.mantelabs.translaas.client;
 
 import io.mantelabs.translaas.client.http.TranslaasHttp;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.mantelabs.translaas.models.GroupTranslationsResponse;
 import io.mantelabs.translaas.models.ProjectLocalesResponse;
 import io.mantelabs.translaas.models.ProjectTranslationsResponse;
+import io.mantelabs.translaas.models.ReportMissingKeysRequest;
 import io.mantelabs.translaas.models.exception.TranslaasApiException;
 import io.mantelabs.translaas.models.json.TranslaasJson;
 import java.io.IOException;
@@ -33,6 +35,10 @@ import java.util.concurrent.ForkJoinPool;
  * TranslaasRequestContext, Executor)}. On {@code 304 Not Modified}, JSON bundle methods complete
  * with {@code null} and {@link TranslaasRequestContext#isNotModified()} is {@code true} when a
  * context instance was provided.
+ *
+ * <p>Missing keys: {@link #reportMissingKeys(ReportMissingKeysRequest, TranslaasRequestContext,
+ * Executor)} — {@code POST} JSON; expects {@code 202 Accepted}. Requires a project-scoped API key
+ * (see {@link #reportMissingKeys(ReportMissingKeysRequest, TranslaasRequestContext, Executor)}).
  */
 public final class TranslaasClient {
 
@@ -49,6 +55,9 @@ public final class TranslaasClient {
 
   /** Path for {@code GET} all translations in a project as {@code application/json}. */
   public static final String TRANSLATIONS_PROJECT_PATH = "/sdk/v1/translations/project";
+
+  /** Path for {@code POST} report missing keys as {@code application/json}. */
+  public static final String TRANSLATIONS_REPORT_MISSING_PATH = "/sdk/v1/translations/report-missing";
 
   /**
    * Value for the {@code format} query parameter to request composite-key flat bundles ({@code
@@ -365,6 +374,52 @@ public final class TranslaasClient {
           "Failed to parse project translations JSON: " + response.uri(),
           e);
     }
+  }
+
+  /**
+   * Reports missing translation keys ({@code Content-Type: application/json}). The server responds
+   * with {@code 202 Accepted} on success.
+   *
+   * <p><strong>Authentication:</strong> requires a <em>project-scoped</em> API key; otherwise the
+   * server typically returns {@code 401 Unauthorized}.
+   *
+   * @param request body with {@code keys} (see {@link ReportMissingKeysRequest})
+   */
+  public CompletableFuture<Void> reportMissingKeys(ReportMissingKeysRequest request) {
+    return reportMissingKeys(request, null, null);
+  }
+
+  /**
+   * Same as {@link #reportMissingKeys(ReportMissingKeysRequest)} with optional per-request query
+   * overrides (e.g. {@link TranslaasRequestContext#setProject(String)} for project scope).
+   */
+  public CompletableFuture<Void> reportMissingKeys(
+      ReportMissingKeysRequest request, TranslaasRequestContext context) {
+    return reportMissingKeys(request, context, null);
+  }
+
+  /**
+   * @param executor optional executor for the async task; defaults to the common pool
+   */
+  public CompletableFuture<Void> reportMissingKeys(
+      ReportMissingKeysRequest request, TranslaasRequestContext context, Executor executor) {
+    Executor exec = executor != null ? executor : ForkJoinPool.commonPool();
+    return CompletableFuture.runAsync(() -> reportMissingKeysBlocking(request, context), exec);
+  }
+
+  private void reportMissingKeysBlocking(ReportMissingKeysRequest request, TranslaasRequestContext context)
+      throws TranslaasApiException {
+    Objects.requireNonNull(request, "request");
+    if (context != null) {
+      context.clearResponseMetadata();
+    }
+    String json;
+    try {
+      json = TranslaasJson.mapper().writeValueAsString(request);
+    } catch (JsonProcessingException e) {
+      throw new TranslaasApiException(0, null, "Failed to serialize report-missing request body", e);
+    }
+    http.post(TRANSLATIONS_REPORT_MISSING_PATH, null, json, null, context);
   }
 
   private static void requireNonBlank(String value, String name) {
