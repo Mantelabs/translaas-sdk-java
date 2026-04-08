@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.mantelabs.translaas.spring.boot.autoconfigure.TranslaasAutoConfiguration
