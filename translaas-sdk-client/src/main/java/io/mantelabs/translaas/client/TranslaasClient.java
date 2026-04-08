@@ -1,7 +1,9 @@
 package io.mantelabs.translaas.client;
 
 import io.mantelabs.translaas.client.http.TranslaasHttp;
+import io.mantelabs.translaas.models.GroupTranslationsResponse;
 import io.mantelabs.translaas.models.ProjectLocalesResponse;
+import io.mantelabs.translaas.models.ProjectTranslationsResponse;
 import io.mantelabs.translaas.models.exception.TranslaasApiException;
 import io.mantelabs.translaas.models.json.TranslaasJson;
 import java.io.IOException;
@@ -25,6 +27,12 @@ import java.util.concurrent.ForkJoinPool;
  * <p>Project locales JSON: {@link #getProjectLocales(String, TranslaasRequestContext, Executor)}.
  * On {@code 304 Not Modified}, the future completes with {@code null} and {@link
  * TranslaasRequestContext#isNotModified()} is {@code true} when a context instance was provided.
+ *
+ * <p>Group and project translation bundles: {@link #getGroupTranslations(String, String, String,
+ * TranslaasRequestContext, Executor)} and {@link #getProjectTranslations(String, String, String,
+ * TranslaasRequestContext, Executor)}. On {@code 304 Not Modified}, JSON bundle methods complete
+ * with {@code null} and {@link TranslaasRequestContext#isNotModified()} is {@code true} when a
+ * context instance was provided.
  */
 public final class TranslaasClient {
 
@@ -35,6 +43,18 @@ public final class TranslaasClient {
 
   /** Path for {@code GET} project locales as {@code application/json}. */
   public static final String TRANSLATIONS_LOCALES_PATH = "/sdk/v1/translations/locales";
+
+  /** Path for {@code GET} all translations in one group as {@code application/json}. */
+  public static final String TRANSLATIONS_GROUP_PATH = "/sdk/v1/translations/group";
+
+  /** Path for {@code GET} all translations in a project as {@code application/json}. */
+  public static final String TRANSLATIONS_PROJECT_PATH = "/sdk/v1/translations/project";
+
+  /**
+   * Value for the {@code format} query parameter to request composite-key flat bundles ({@code
+   * group.entry} keys on project; plain entry keys within the group).
+   */
+  public static final String FORMAT_FLAT_JSON = "flat-json";
 
   private final TranslaasHttp http;
 
@@ -188,6 +208,168 @@ public final class TranslaasClient {
           snippet(body),
           "Failed to parse project locales JSON: " + response.uri(),
           e);
+    }
+  }
+
+  /**
+   * Fetches all entries for a single group ({@code application/json}).
+   *
+   * <p>Query parameters: required {@code project}, {@code group}, {@code lang}; optional {@code
+   * channel}, {@code v}, {@code includeContext} from {@link TranslaasOptions} and {@link
+   * TranslaasRequestContext}.
+   *
+   * @return deserialized body, or {@code null} when the server returns {@code 304} (see {@link
+   *     TranslaasRequestContext#isNotModified()})
+   */
+  public CompletableFuture<GroupTranslationsResponse> getGroupTranslations(
+      String project, String group, String lang) {
+    return getGroupTranslations(project, group, lang, null, null, null);
+  }
+
+  /**
+   * Same as {@link #getGroupTranslations(String, String, String)} with optional per-request context
+   * (conditional GET when {@link TranslaasOptions#isUseConditionalRequests()} is true).
+   */
+  public CompletableFuture<GroupTranslationsResponse> getGroupTranslations(
+      String project, String group, String lang, TranslaasRequestContext context) {
+    return getGroupTranslations(project, group, lang, null, context, null);
+  }
+
+  /**
+   * @param executor optional executor for the async task; defaults to the common pool
+   */
+  public CompletableFuture<GroupTranslationsResponse> getGroupTranslations(
+      String project, String group, String lang, TranslaasRequestContext context, Executor executor) {
+    return getGroupTranslations(project, group, lang, null, context, executor);
+  }
+
+  /**
+   * @param format optional response shape ({@link #FORMAT_FLAT_JSON}); {@code null} omits the query
+   *     parameter
+   * @param executor optional executor for the async task; defaults to the common pool
+   */
+  public CompletableFuture<GroupTranslationsResponse> getGroupTranslations(
+      String project,
+      String group,
+      String lang,
+      String format,
+      TranslaasRequestContext context,
+      Executor executor) {
+    Executor exec = executor != null ? executor : ForkJoinPool.commonPool();
+    return CompletableFuture.supplyAsync(
+        () -> getGroupTranslationsBlocking(project, group, lang, format, context), exec);
+  }
+
+  private GroupTranslationsResponse getGroupTranslationsBlocking(
+      String project, String group, String lang, String format, TranslaasRequestContext context)
+      throws TranslaasApiException {
+    requireNonBlank(project, "project");
+    requireNonBlank(group, "group");
+    requireNonBlank(lang, "lang");
+    if (context != null) {
+      context.clearResponseMetadata();
+    }
+    LinkedHashMap<String, String> query = new LinkedHashMap<>();
+    query.put("project", project);
+    query.put("group", group);
+    query.put("lang", lang);
+    if (format != null && !format.isBlank()) {
+      query.put("format", format);
+    }
+    HttpResponse<String> response = http.get(TRANSLATIONS_GROUP_PATH, query, context);
+    if (response.statusCode() == 304) {
+      return null;
+    }
+    String body = response.body();
+    try {
+      return TranslaasJson.mapper()
+          .readValue(body != null ? body : "", GroupTranslationsResponse.class);
+    } catch (IOException e) {
+      throw new TranslaasApiException(
+          response.statusCode(),
+          snippet(body),
+          "Failed to parse group translations JSON: " + response.uri(),
+          e);
+    }
+  }
+
+  /**
+   * Fetches all translations for a project ({@code application/json}), nested or flat-json per
+   * {@code format}.
+   *
+   * <p>Query parameters: required {@code project}, {@code lang}; optional {@code format}, {@code
+   * channel}, {@code v}, {@code includeContext} from options and context.
+   *
+   * @return deserialized body, or {@code null} when the server returns {@code 304}
+   */
+  public CompletableFuture<ProjectTranslationsResponse> getProjectTranslations(
+      String project, String lang) {
+    return getProjectTranslations(project, lang, null, null, null);
+  }
+
+  public CompletableFuture<ProjectTranslationsResponse> getProjectTranslations(
+      String project, String lang, TranslaasRequestContext context) {
+    return getProjectTranslations(project, lang, null, context, null);
+  }
+
+  /**
+   * @param executor optional executor for the async task; defaults to the common pool
+   */
+  public CompletableFuture<ProjectTranslationsResponse> getProjectTranslations(
+      String project, String lang, TranslaasRequestContext context, Executor executor) {
+    return getProjectTranslations(project, lang, null, context, executor);
+  }
+
+  /**
+   * @param format optional {@link #FORMAT_FLAT_JSON}; {@code null} uses the API default (nested
+   *     groups)
+   * @param executor optional executor for the async task; defaults to the common pool
+   */
+  public CompletableFuture<ProjectTranslationsResponse> getProjectTranslations(
+      String project,
+      String lang,
+      String format,
+      TranslaasRequestContext context,
+      Executor executor) {
+    Executor exec = executor != null ? executor : ForkJoinPool.commonPool();
+    return CompletableFuture.supplyAsync(
+        () -> getProjectTranslationsBlocking(project, lang, format, context), exec);
+  }
+
+  private ProjectTranslationsResponse getProjectTranslationsBlocking(
+      String project, String lang, String format, TranslaasRequestContext context)
+      throws TranslaasApiException {
+    requireNonBlank(project, "project");
+    requireNonBlank(lang, "lang");
+    if (context != null) {
+      context.clearResponseMetadata();
+    }
+    LinkedHashMap<String, String> query = new LinkedHashMap<>();
+    query.put("project", project);
+    query.put("lang", lang);
+    if (format != null && !format.isBlank()) {
+      query.put("format", format);
+    }
+    HttpResponse<String> response = http.get(TRANSLATIONS_PROJECT_PATH, query, context);
+    if (response.statusCode() == 304) {
+      return null;
+    }
+    String body = response.body();
+    try {
+      return TranslaasJson.mapper()
+          .readValue(body != null ? body : "", ProjectTranslationsResponse.class);
+    } catch (IOException e) {
+      throw new TranslaasApiException(
+          response.statusCode(),
+          snippet(body),
+          "Failed to parse project translations JSON: " + response.uri(),
+          e);
+    }
+  }
+
+  private static void requireNonBlank(String value, String name) {
+    if (value == null || value.isBlank()) {
+      throw new IllegalArgumentException(name + " is required");
     }
   }
 

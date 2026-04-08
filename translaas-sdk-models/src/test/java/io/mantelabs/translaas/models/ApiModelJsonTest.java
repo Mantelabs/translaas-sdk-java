@@ -50,10 +50,11 @@ class ApiModelJsonTest {
     assertThat(r.getEntries()).containsKeys("greeting", "count");
     assertThat(r.getEntries().get("greeting").asText()).isEqualTo("Hello");
     assertThat(r.getEntryContext().get("greeting").get("hint")).isEqualTo("title");
+    assertThat(r.getGroupEntryContext()).isNull();
   }
 
   @Test
-  void projectTranslationsResponse_deserializesSameShapeAsGroup() throws Exception {
+  void groupTranslationsResponse_deserializesGroupEntryContext() throws Exception {
     String json =
         "{"
             + "\"project\":\"demo\","
@@ -61,13 +62,57 @@ class ApiModelJsonTest {
             + "\"version\":1,"
             + "\"generatedAt\":\"2026-04-07T12:00:00Z\","
             + "\"entries\":{\"k\":\"v\"},"
-            + "\"entryContext\":null"
+            + "\"groupEntryContext\":{\"k\":{\"note\":\"meta\"}}"
+            + "}";
+
+    GroupTranslationsResponse r = mapper.readValue(json, GroupTranslationsResponse.class);
+
+    assertThat(r.getGroupEntryContext().get("k").get("note")).isEqualTo("meta");
+  }
+
+  @Test
+  void projectTranslationsResponse_deserializesFlatJsonShape() throws Exception {
+    String json =
+        "{"
+            + "\"project\":\"demo\","
+            + "\"lang\":\"en\","
+            + "\"version\":1,"
+            + "\"generatedAt\":\"2026-04-07T12:00:00Z\","
+            + "\"entries\":{\"common.welcome\":\"Hello\",\"ui.btn\":\"OK\"},"
+            + "\"entryContext\":{\"common.welcome\":{\"hint\":\"greeting\"}},"
+            + "\"groupEntryContext\":null"
             + "}";
 
     ProjectTranslationsResponse r = mapper.readValue(json, ProjectTranslationsResponse.class);
 
-    assertThat(r.getEntries().get("k").asText()).isEqualTo("v");
-    assertThat(r.getEntryContext()).isNull();
+    assertThat(r.getGroups()).isNull();
+    assertThat(r.getEntries().get("common.welcome").asText()).isEqualTo("Hello");
+    assertThat(r.getEntryContext().get("common.welcome").get("hint")).isEqualTo("greeting");
+    assertThat(r.getGroupEntryContext()).isNull();
+  }
+
+  @Test
+  void projectTranslationsResponse_deserializesNestedGroupsShape() throws Exception {
+    String json =
+        "{"
+            + "\"project\":\"demo\","
+            + "\"lang\":\"en\","
+            + "\"version\":2,"
+            + "\"generatedAt\":\"2026-04-07T12:00:00Z\","
+            + "\"groups\":{"
+            + "\"common\":{\"entries\":{\"welcome\":\"Hello\"},\"entryContext\":{\"welcome\":{\"hint\":\"h\"}}},"
+            + "\"ui\":{\"entries\":{\"btn\":\"OK\"}}"
+            + "}"
+            + "}";
+
+    ProjectTranslationsResponse r = mapper.readValue(json, ProjectTranslationsResponse.class);
+
+    assertThat(r.getEntries()).isNull();
+    assertThat(r.getGroups()).containsKeys("common", "ui");
+    assertThat(r.getGroups().get("common").getEntries().get("welcome").asText()).isEqualTo("Hello");
+    assertThat(r.getGroups().get("common").getEntryContext().get("welcome").get("hint"))
+        .isEqualTo("h");
+    assertThat(r.getGroups().get("ui").getEntries().get("btn").asText()).isEqualTo("OK");
   }
 
   @Test
