@@ -1,5 +1,7 @@
 package io.mantelabs.translaas.client;
 
+import java.net.URI;
+
 /**
  * Canonical test API origin for client tests (no real HTTP; URI shape only).
  */
@@ -11,6 +13,14 @@ public final class TestApiUrls {
 
   /** Same host with a non-default HTTPS port (normalization must preserve port). */
   public static final String ORIGIN_PORT_8443 = "https://api.translaas.local:8443";
+
+  /**
+   * HTTP origin for a local server (e.g. WireMock) on {@value #HOST} with a dynamic port. Prefer
+   * this over {@code localhost} so tests match the canonical API host used elsewhere.
+   */
+  public static URI httpOrigin(int port) {
+    return URI.create("http://" + HOST + ":" + port);
+  }
 
   private TestApiUrls() {}
 }

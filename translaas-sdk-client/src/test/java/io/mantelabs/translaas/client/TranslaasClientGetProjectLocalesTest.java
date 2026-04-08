@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.github.tomakehurst.wiremock.junit5.WireMockRuntimeInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import io.mantelabs.translaas.models.ProjectLocalesResponse;
-import java.net.URI;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
@@ -57,7 +56,7 @@ class TranslaasClientGetProjectLocalesTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl(URI.create("http://localhost:" + wm.getHttpPort()))
+            .baseUrl(TestApiUrls.httpOrigin(wm.getHttpPort()))
             .channel("beta")
             .snapshotVersion("3")
             .build();
@@ -80,7 +79,7 @@ class TranslaasClientGetProjectLocalesTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("k")
-            .baseUrl(URI.create("http://localhost:" + wm.getHttpPort()))
+            .baseUrl(TestApiUrls.httpOrigin(wm.getHttpPort()))
             .useConditionalRequests(true)
             .build();
     TranslaasClient client = new TranslaasClient(options);
@@ -100,7 +99,7 @@ class TranslaasClientGetProjectLocalesTest {
         new TranslaasClient(
             TranslaasOptions.builder()
                 .apiKey("k")
-                .baseUrl(URI.create("http://localhost:9"))
+                .baseUrl(TestApiUrls.httpOrigin(9))
                 .build());
 
     assertThatThrownBy(() -> client.getProjectLocales("  ").join())
@@ -111,7 +110,7 @@ class TranslaasClientGetProjectLocalesTest {
     TranslaasOptions options =
         TranslaasOptions.builder()
             .apiKey("test-key")
-            .baseUrl(URI.create("http://localhost:" + port))
+            .baseUrl(TestApiUrls.httpOrigin(port))
             .build();
     return new TranslaasClient(options);
   }
