@@ -81,6 +81,20 @@ class TranslaasServiceTest {
   }
 
   @Test
+  void resolveLanguage_matchesTWithoutExplicitLang() {
+    io.mantelabs.translaas.client.TranslaasOptions opts =
+        io.mantelabs.translaas.client.TranslaasOptions.builder()
+            .apiKey("k")
+            .baseUrl("https://api.example.com")
+            .defaultLanguage(LanguageCodes.ENGLISH)
+            .build();
+
+    LanguageResolver german = () -> Optional.of("de");
+    TranslaasService service = new TranslaasService(client, opts, List.of(german));
+    assertThat(service.resolveLanguage()).isEqualTo("de");
+  }
+
+  @Test
   void t_withoutLang_usesLanguageResolverBeforeDefault() {
     io.mantelabs.translaas.client.TranslaasOptions opts =
         io.mantelabs.translaas.client.TranslaasOptions.builder()
