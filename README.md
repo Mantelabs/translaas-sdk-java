@@ -19,7 +19,7 @@ Published artifacts use the `**io.mantelabs`** group ID (reverse-DNS for [mantel
 - **Offline / hybrid caching** — File-based bundles when supported by the client module
 - **Resilience** — Configurable timeouts and retry policies on the HTTP layer
 - **Modular artifacts** — Optional split modules (core client, models, integrations) if published separately
-- **Async-friendly** — Asynchronous calls where the API exposes them (`CompletableFuture`, or virtual-thread friendly blocking APIs on modern JDKs)
+- **Async-capable** — Lookups return **`CompletableFuture`**: compose with **`thenApply`** / **`whenComplete`** / **`handle`**, or wait explicitly with **`join()`** / **`get()`** when you need the **`String`** (see [`CompletableFuture` and `join()`](#completablefuture-and-join); **virtual threads** on JDK 21+ reduce the cost of blocking waits)
 - **Standard build tooling** — Published to Maven Central; works with Maven, Gradle, and other JVM build tools
 
 ## Requirements
@@ -109,7 +109,7 @@ TranslaasOptions options = TranslaasOptions.builder()
 
 TranslaasService translaas = new TranslaasService(options);
 
-// Example: async style (exact method names follow the shipped API)
+// Each t(...) returns CompletableFuture<String>; .join() blocks until the value is ready.
 var welcome = translaas.t("common", "welcome", LanguageCodes.ENGLISH).join();
 
 // With automatic language resolution when providers are configured
@@ -118,6 +118,10 @@ var welcomeAuto = translaas.t("common", "welcome").join();
 // Pluralization (signature mirrors server / SDK contract)
 var items = translaas.t("messages", "item", LanguageCodes.ENGLISH, 5).join();
 ```
+
+#### `CompletableFuture` and `join()`
+
+The convenience and client APIs are **async-first**: they return **`CompletableFuture<String>`** so you can chain **`thenApply`**, **`whenComplete`**, **`handle`**, or pass an **`Executor`** on overloads that support it. **`join()`** is a **blocking** wait (same thread does not proceed until the future completes). That is fine for samples, tests, one-off scripts, template engines, and often for code running on **virtual threads** (JDK 21+). On a **bounded platform thread pool** (typical servlet containers), many concurrent **`join()`** calls can tie up threads until I/O finishes; in those setups prefer non-blocking composition or offload blocking work deliberately.
 
 **Option B — `TranslaasClient` (full HTTP API)**
 
@@ -136,7 +140,7 @@ TranslaasClient client = new TranslaasClient(options);
 var translation = client.getEntry("common", "welcome", LanguageCodes.ENGLISH).join();
 ```
 
-Use blocking adapters if the SDK provides them (for example `getEntryBlocking`) in servlet-style code; prefer async APIs on structured concurrency or event-loop style runtimes when available.
+Same **`CompletableFuture`** model as **`TranslaasService`**; use **`join()`** only when you intend to block ([`CompletableFuture` and `join()`](#completablefuture-and-join)).
 
 ## Configuration
 
@@ -311,7 +315,7 @@ Add **`translaas-sdk-thymeleaf-spring-boot-starter`** alongside **`translaas-sdk
 </dependency>
 ```
 
-**Template usage** — declare the namespace on the root element, then use **`translaas:text`** (Thymeleaf runs **`TranslaasService`** during render and **`CompletableFuture.join()`** on the request thread):
+**Template usage** — declare the namespace on the root element, then use **`translaas:text`**. During render, the dialect calls **`TranslaasService`** and **blocks the request thread** with **`CompletableFuture.join()`** until each lookup completes (same tradeoffs as **`join()`** in controllers).
 
 ```html
 <!DOCTYPE html>
@@ -345,6 +349,7 @@ Without the starter, you can expose **`TranslaasClient`** / **`TranslaasService`
 **With `TranslaasService`**
 
 ```java
+// Blocking wait — prefer CompletableFuture chaining in async code ([note](#completablefuture-and-join)).
 var translation = translaas.t("ui", "button.save", LanguageCodes.ENGLISH).join();
 var withPlural = translaas.t("messages", "item.count", LanguageCodes.ENGLISH, 5).join();
 ```
@@ -363,7 +368,7 @@ var withPlural = client.getEntry("messages", "item.count", LanguageCodes.ENGLISH
 | ------------------------- | ------------------------------------------------------------------- |
 | JDK 11+                   | Baseline for this library                                           |
 | JDK 17+ / 21+             | Recommended LTS for new services                                    |
-| Virtual threads (JDK 21+) | Use with blocking HTTP APIs or SDK blocking wrappers where provided |
+| Virtual threads (JDK 21+) | Often a good fit for **`CompletableFuture.join()`** on lookup calls without blocking scarce platform threads |
 
 
 ## Error handling
