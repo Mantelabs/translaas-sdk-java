@@ -134,6 +134,14 @@ public final class TranslaasService {
     return languageResolvers;
   }
 
+  /**
+   * Resolves the target language using the same {@link LanguageResolver} chain and defaults as {@link
+   * #t(String, String)} when no explicit language is provided.
+   */
+  public String resolveLanguage() {
+    return resolveLanguageForRequest();
+  }
+
   private CompletableFuture<String> getEntry(
       String group,
       String entry,
@@ -148,7 +156,7 @@ public final class TranslaasService {
     return client.getEntry(group, entry, lang, pluralN, parameters, context, executor);
   }
 
-  private String resolveLanguage() {
+  private String resolveLanguageForRequest() {
     for (LanguageResolver r : languageResolvers) {
       Optional<String> lang = r.resolveLanguage();
       if (lang.isPresent()) {
