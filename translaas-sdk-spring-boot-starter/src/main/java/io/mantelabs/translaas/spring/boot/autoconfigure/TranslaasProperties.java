@@ -34,6 +34,12 @@ public class TranslaasProperties {
   private boolean skipApiValidation;
   private String apiKeyHeader;
 
+  /**
+   * When {@code true}, use HTTP/1.1 only for the JDK {@link java.net.http.HttpClient} (avoids HTTP/2 with
+   * gateways that close the channel — often surfaces as {@link java.nio.channels.ClosedChannelException}).
+   */
+  private boolean preferHttp11;
+
   private final Caching caching = new Caching();
   private final LocaleSettings locale = new LocaleSettings();
 
@@ -157,6 +163,14 @@ public class TranslaasProperties {
     this.apiKeyHeader = apiKeyHeader;
   }
 
+  public boolean isPreferHttp11() {
+    return preferHttp11;
+  }
+
+  public void setPreferHttp11(boolean preferHttp11) {
+    this.preferHttp11 = preferHttp11;
+  }
+
   public Caching getCaching() {
     return caching;
   }
@@ -208,6 +222,7 @@ public class TranslaasProperties {
     if (cacheProvider != null) {
       b.cacheProvider(cacheProvider);
     }
+    b.preferHttp11(preferHttp11);
     return b.build();
   }
 

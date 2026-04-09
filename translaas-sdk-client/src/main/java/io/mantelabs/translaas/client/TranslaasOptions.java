@@ -34,6 +34,12 @@ public final class TranslaasOptions {
   private final boolean skipApiValidation;
   private final String apiKeyHeader;
   private final TranslaasCacheProvider cacheProvider;
+  /**
+   * When {@code true}, the JDK {@link java.net.http.HttpClient} uses {@link
+   * java.net.http.HttpClient.Version#HTTP_1_1} only. Some reverse proxies and dev gateways close the
+   * connection when negotiating HTTP/2 ({@code ClosedChannelException}); enable this for compatibility.
+   */
+  private final boolean preferHttp11;
 
   public String getApiKey() {
     return apiKey;
@@ -111,6 +117,10 @@ public final class TranslaasOptions {
     return Optional.ofNullable(cacheProvider);
   }
 
+  public boolean isPreferHttp11() {
+    return preferHttp11;
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -133,6 +143,7 @@ public final class TranslaasOptions {
     private boolean skipApiValidation;
     private String apiKeyHeader;
     private TranslaasCacheProvider cacheProvider;
+    private boolean preferHttp11;
 
     private Builder() {}
 
@@ -224,6 +235,15 @@ public final class TranslaasOptions {
       return this;
     }
 
+    /**
+     * Prefer HTTP/1.1 for TLS (disables HTTP/2 ALPN). Use when the API or gateway closes connections with
+     * {@link java.nio.channels.ClosedChannelException} on the default client.
+     */
+    public Builder preferHttp11(boolean preferHttp11) {
+      this.preferHttp11 = preferHttp11;
+      return this;
+    }
+
     public TranslaasOptions build() {
       if (apiKey == null || apiKey.isBlank()) {
         throw new TranslaasConfigurationException("apiKey is required");
@@ -252,5 +272,6 @@ public final class TranslaasOptions {
     this.skipApiValidation = builder.skipApiValidation;
     this.apiKeyHeader = builder.apiKeyHeader != null ? builder.apiKeyHeader : DEFAULT_API_KEY_HEADER;
     this.cacheProvider = builder.cacheProvider;
+    this.preferHttp11 = builder.preferHttp11;
   }
 }

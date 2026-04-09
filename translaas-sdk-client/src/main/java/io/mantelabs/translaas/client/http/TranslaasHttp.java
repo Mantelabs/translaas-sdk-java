@@ -6,6 +6,7 @@ import io.mantelabs.translaas.models.exception.TranslaasApiException;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
+import java.net.http.HttpClient.Version;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
@@ -47,6 +48,9 @@ public final class TranslaasHttp {
 
   private static HttpClient newClient(TranslaasOptions options) {
     HttpClient.Builder b = HttpClient.newBuilder();
+    if (options.isPreferHttp11()) {
+      b.version(Version.HTTP_1_1);
+    }
     Duration timeout = options.getTimeout();
     if (timeout != null) {
       b.connectTimeout(timeout);

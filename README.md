@@ -298,6 +298,7 @@ Required keys match programmatic **`TranslaasOptions`**: `api-key` and `base-url
 | `translaas.enabled` | When `false`, skips auto-configuration (default `true`). |
 | `translaas.caching.memory.enabled` | Registers a **`MemoryTranslaasCacheProvider`** bean (if you did not define your own **`TranslaasCacheProvider`**), with optional `translaas.caching.memory.lru-max-entries`. |
 | `translaas.locale.use-spring-locale-context` | Registers a **`LanguageResolver`** that uses Spring’s **`LocaleContextHolder`** (request locale in Spring MVC). |
+| `translaas.prefer-http-11` | When **`true`**, the SDK’s JDK **`HttpClient`** uses **HTTP/1.1** only (skips HTTP/2 ALPN). Use if your API or reverse proxy closes TLS with **`ClosedChannelException`**. |
 
 Disable or replace beans by defining your own **`TranslaasClient`**, **`TranslaasService`**, or **`io.mantelabs.translaas.TranslaasOptions`** bean where needed.
 
@@ -459,14 +460,15 @@ TranslaasOptions options = TranslaasOptions.builder()
 
 ## Examples
 
-Sample projects may live under `examples/` (not always tracked). If present:
+Primary samples live in **[translaas-sdk-examples](https://github.com/Mantelabs/translaas-sdk-examples)** (multiple languages). For Java:
 
-```bash
-cd examples/basic
-./mvnw exec:java -Dexec.mainClass="com.example.Main"
-```
+| Sample | Description |
+| ------ | ----------- |
+| [`java/translaas-samples-webapp`](https://github.com/Mantelabs/translaas-sdk-examples/tree/main/java/translaas-samples-webapp) | Spring MVC + Thymeleaf — strings from **`TranslaasService`** in controllers (`th:text` on model attributes). |
+| [`java/translaas-samples-thymeleaf-webapp`](https://github.com/Mantelabs/translaas-sdk-examples/tree/main/java/translaas-samples-thymeleaf-webapp) | Same stack — uses **`translaas-sdk-thymeleaf-spring-boot-starter`** and **`<translaas:text />`** in templates (see [Spring Boot + Thymeleaf](#spring-boot--thymeleaf-optional-starter) above). |
+| [`java/translaas-samples-console`](https://github.com/Mantelabs/translaas-sdk-examples/tree/main/java/translaas-samples-console) | Non-web Spring Boot **`CommandLineRunner`**. |
 
-Adjust module layout and commands to match the repository once examples are added.
+Clone that repository, run **`mvn install`** from this **translaas-sdk-java** repo so local **`io.mantelabs`** artifacts resolve, then **`mvn spring-boot:run`** inside the sample directory (see each sample’s **README.md**).
 
 ## License
 
