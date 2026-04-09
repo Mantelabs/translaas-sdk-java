@@ -297,6 +297,43 @@ Required keys match programmatic **`TranslaasOptions`**: `api-key` and `base-url
 
 Disable or replace beans by defining your own **`TranslaasClient`**, **`TranslaasService`**, or **`io.mantelabs.translaas.TranslaasOptions`** bean where needed.
 
+### Spring Boot + Thymeleaf (optional starter)
+
+Add **`translaas-sdk-thymeleaf-spring-boot-starter`** alongside **`translaas-sdk-spring-boot-starter`** and **`spring-boot-starter-thymeleaf`**. The artifact pulls those transitively, registers **`TranslaasDialect`** on the auto-configured **`SpringTemplateEngine`**, and reuses existing **`TranslaasService`** / **`LanguageResolver`** / **`translaas.*`** configuration.
+
+**Maven**
+
+```xml
+<dependency>
+  <groupId>io.mantelabs</groupId>
+  <artifactId>translaas-sdk-thymeleaf-spring-boot-starter</artifactId>
+  <version>x.y.z</version>
+</dependency>
+```
+
+**Template usage** — declare the namespace on the root element, then use **`translaas:text`** (Thymeleaf runs **`TranslaasService`** during render and **`CompletableFuture.join()`** on the request thread):
+
+```html
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:translaas="https://translaas.mantelabs.io">
+<body>
+  <p><translaas:text group="common" entry="welcome"/></p>
+  <p><translaas:text group="common" entry="hello" lang="fr" number="3" params='{"name":"Ada"}'/></p>
+</body>
+</html>
+```
+
+| Attribute | Required | Notes |
+| --------- | -------- | ----- |
+| `group` | yes | Literal or standard expression. |
+| `entry` | yes | Literal or standard expression. |
+| `lang` | no | Omit to use the same resolution as **`t(group, entry)`** (defaults + **`LanguageResolver`**). |
+| `number` | no | Plural **`n`** (literal or expression); passed through to **`TranslaasService`**. |
+| `params` | no | JSON object of string values, or an expression that evaluates to **`Map`**; interpolation parameters for the API. |
+
+Markup aligns with the .NET Razor **translaas** tag helper: **`group`**, **`entry`**, optional **`lang`**, **`number`**, and interpolation **`params`**.
+
 ### Other JVM frameworks
 
 Without the starter, you can expose **`TranslaasClient`** / **`TranslaasService`** as **`@Bean`** methods from **`@Configuration`** (for example in Spring Boot), or use **CDI** producers on **Jakarta EE**, **Quarkus**, or **Micronaut**. **Android** is only appropriate if the SDK’s Android policy and dependencies match your app; prefer a dedicated Android artifact if one is published.
