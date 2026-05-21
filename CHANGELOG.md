@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.0-beta-SNAPSHOT] - 2026-05-21
+
 ### Added
 
 - `CacheKeyBuilder` aligned with .NET colon-separated cache keys.
@@ -9,6 +11,11 @@
 - `TranslationResponseParsing` for group bare maps and project `flat-json` composite keys.
 - `OfflineCacheDownloadResult.isNotModified()` and `notModified()` factory.
 - `TranslationResponses` empty-model factories for 204/304 parity.
+- Offline stack: `OfflineCacheOptions`, `CachingTranslaasClient`, `SpecFileCacheProvider`, `OfflineZipBundle`, `OfflineCacheSyncService`.
+- `PluralResolver`, `ParameterReplacer`, `TranslationEntries` for offline entry resolution.
+- `TranslaasTranslationClient` interface; `TranslaasService` forwards bundle/offline APIs.
+- Spring Boot `translaas.offline.*` properties and sync service bean.
+- `docs/PARITY_CHECKLIST.md` and `examples/java/offline-node`.
 
 ### Changed
 
@@ -17,12 +24,17 @@
 - `/text` auto-injects query param `N` when plural `n` is set.
 - Empty `report-missing` skips the HTTP call.
 - API error messages prefer JSON `{ "code", "message" }` when present.
+- Version line aligned with JS/Python **0.3.0-beta**.
 
 ### Fixed
 
 - Shorthand `/text` entry query keys no longer pollute L1 cache keys as interpolation parameters.
 - Uppercase `N` may be passed as an explicit interpolation parameter without conflicting with plural `n`.
 
-### Tracking
+### Migration
 
-- Part of [#47](https://github.com/acuencadev/translaas-sdk-java/issues/47) — Phase A (contract correctness) complete; Phases B–C remain.
+- L1 cache keys changed from `path + queryString` to `CacheKeyBuilder` format (invalidate in-memory caches).
+- JSON bundle methods return empty models on 304 without cache instead of `null`.
+- Offline disk layout uses spec §7.6 (`manifest.json` tree), not the legacy hash blob store.
+
+Closes [#47](https://github.com/acuencadev/translaas-sdk-java/issues/47)

@@ -17,7 +17,7 @@ Published artifacts use the `**io.mantelabs`** group ID (reverse-DNS for [mantel
 - **Automatic language resolution** — Optional locale when language providers are configured
 - **Flexible caching** — Pluggable or built-in cache modes (memory, entry, group, project) where the SDK exposes them
 - **Offline / hybrid caching** — File-based bundles when supported by the client module
-- **Resilience** — Configurable timeouts and retry policies on the HTTP layer
+- **Resilience** — Configurable HTTP timeouts (`TranslaasOptions.timeout`)
 - **Modular artifacts** — Optional split modules (core client, models, integrations) if published separately
 - **Async-capable** — Lookups return **`CompletableFuture`**: compose with **`thenApply`** / **`whenComplete`** / **`handle`**, or wait explicitly with **`join()`** / **`get()`** when you need the **`String`** (see [`CompletableFuture` and `join()`](#completablefuture-and-join); **virtual threads** on JDK 21+ reduce the cost of blocking waits)
 - **Standard build tooling** — Published to Maven Central; works with Maven, Gradle, and other JVM build tools

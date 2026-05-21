@@ -5,7 +5,11 @@ import io.mantelabs.translaas.TranslaasOptions;
 import io.mantelabs.translaas.caching.MemoryTranslaasCacheOptions;
 import io.mantelabs.translaas.caching.MemoryTranslaasCacheProvider;
 import io.mantelabs.translaas.caching.TranslaasCacheProvider;
+import io.mantelabs.translaas.client.OfflineCacheOptions;
+import io.mantelabs.translaas.client.OfflineFallbackMode;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -36,6 +40,7 @@ public class TranslaasProperties {
   private String sdkTranslationsPathPrefix;
 
   private final Caching caching = new Caching();
+  private final Offline offline = new Offline();
   private final LocaleSettings locale = new LocaleSettings();
 
   public boolean isEnabled() {
@@ -170,6 +175,10 @@ public class TranslaasProperties {
     return caching;
   }
 
+  public Offline getOffline() {
+    return offline;
+  }
+
   public LocaleSettings getLocale() {
     return locale;
   }
@@ -220,6 +229,29 @@ public class TranslaasProperties {
     if (sdkTranslationsPathPrefix != null && !sdkTranslationsPathPrefix.isBlank()) {
       b.sdkTranslationsPathPrefix(sdkTranslationsPathPrefix);
     }
+    if (offline.isEnabled()) {
+      OfflineCacheOptions.Builder ob = OfflineCacheOptions.builder().enabled(true);
+      if (offline.getCacheDirectory() != null) {
+        ob.cacheDirectory(offline.getCacheDirectory());
+      }
+      if (offline.getFallbackMode() != null) {
+        ob.fallbackMode(OfflineFallbackMode.valueOf(offline.getFallbackMode().trim().toUpperCase(java.util.Locale.ROOT)));
+      }
+      if (offline.getDefaultProjectId() != null) {
+        ob.defaultProjectId(offline.getDefaultProjectId());
+      }
+      if (offline.getAutoSyncInterval() != null) {
+        ob.autoSyncInterval(offline.getAutoSyncInterval());
+      }
+      ob.autoSync(offline.isAutoSync());
+      if (offline.getProjects() != null) {
+        ob.projects(offline.getProjects());
+      }
+      if (offline.getLanguages() != null) {
+        ob.languages(offline.getLanguages());
+      }
+      b.offlineCache(ob.build());
+    }
     return b.build();
   }
 
@@ -262,6 +294,82 @@ public class TranslaasProperties {
       public void setLruMaxEntries(Integer lruMaxEntries) {
         this.lruMaxEntries = lruMaxEntries;
       }
+    }
+  }
+
+  public static final class Offline {
+
+    private boolean enabled;
+    private String cacheDirectory = OfflineCacheOptions.DEFAULT_CACHE_DIRECTORY;
+    private String fallbackMode = OfflineFallbackMode.CACHE_FIRST.name();
+    private boolean autoSync = true;
+    private Duration autoSyncInterval;
+    private String defaultProjectId;
+    private List<String> projects = new ArrayList<>();
+    private List<String> languages = new ArrayList<>();
+
+    public boolean isEnabled() {
+      return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+      this.enabled = enabled;
+    }
+
+    public String getCacheDirectory() {
+      return cacheDirectory;
+    }
+
+    public void setCacheDirectory(String cacheDirectory) {
+      this.cacheDirectory = cacheDirectory;
+    }
+
+    public String getFallbackMode() {
+      return fallbackMode;
+    }
+
+    public void setFallbackMode(String fallbackMode) {
+      this.fallbackMode = fallbackMode;
+    }
+
+    public boolean isAutoSync() {
+      return autoSync;
+    }
+
+    public void setAutoSync(boolean autoSync) {
+      this.autoSync = autoSync;
+    }
+
+    public Duration getAutoSyncInterval() {
+      return autoSyncInterval;
+    }
+
+    public void setAutoSyncInterval(Duration autoSyncInterval) {
+      this.autoSyncInterval = autoSyncInterval;
+    }
+
+    public String getDefaultProjectId() {
+      return defaultProjectId;
+    }
+
+    public void setDefaultProjectId(String defaultProjectId) {
+      this.defaultProjectId = defaultProjectId;
+    }
+
+    public List<String> getProjects() {
+      return projects;
+    }
+
+    public void setProjects(List<String> projects) {
+      this.projects = projects != null ? new ArrayList<>(projects) : new ArrayList<>();
+    }
+
+    public List<String> getLanguages() {
+      return languages;
+    }
+
+    public void setLanguages(List<String> languages) {
+      this.languages = languages != null ? new ArrayList<>(languages) : new ArrayList<>();
     }
   }
 

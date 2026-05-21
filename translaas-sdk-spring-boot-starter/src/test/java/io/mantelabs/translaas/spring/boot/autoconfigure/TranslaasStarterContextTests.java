@@ -3,7 +3,7 @@ package io.mantelabs.translaas.spring.boot.autoconfigure;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.mantelabs.translaas.TranslaasService;
-import io.mantelabs.translaas.client.TranslaasClient;
+import io.mantelabs.translaas.client.TranslaasTranslationClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration;
 @SpringBootTest(classes = TranslaasStarterContextTests.MinimalBootApp.class)
 class TranslaasStarterContextTests {
 
-  @Autowired private TranslaasClient translaasClient;
+  @Autowired private TranslaasTranslationClient translaasClient;
   @Autowired private TranslaasService translaasService;
 
   @Test
