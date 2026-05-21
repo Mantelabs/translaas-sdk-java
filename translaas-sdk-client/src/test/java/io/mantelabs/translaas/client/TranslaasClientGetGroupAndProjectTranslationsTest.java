@@ -146,7 +146,7 @@ class TranslaasClientGetGroupAndProjectTranslationsTest {
   }
 
   @Test
-  void getGroupTranslations_setsNotModifiedAndReturnsNull_when304(WireMockRuntimeInfo wm) {
+  void getGroupTranslations_setsNotModifiedAndReturnsEmpty_when304(WireMockRuntimeInfo wm) {
     wm.getWireMock()
         .register(
             get(urlPathEqualTo(TranslaasClient.TRANSLATIONS_GROUP_PATH))
@@ -169,12 +169,13 @@ class TranslaasClientGetGroupAndProjectTranslationsTest {
 
     GroupTranslationsResponse r = client.getGroupTranslations("demo", "g", "en", ctx).join();
 
-    assertThat(r).isNull();
+    assertThat(r).isNotNull();
+    assertThat(r.getEntries()).isEmpty();
     assertThat(ctx.isNotModified()).isTrue();
   }
 
   @Test
-  void getProjectTranslations_setsNotModifiedAndReturnsNull_when304(WireMockRuntimeInfo wm) {
+  void getProjectTranslations_setsNotModifiedAndReturnsEmpty_when304(WireMockRuntimeInfo wm) {
     wm.getWireMock()
         .register(
             get(urlPathEqualTo(TranslaasClient.TRANSLATIONS_PROJECT_PATH))
@@ -196,7 +197,8 @@ class TranslaasClientGetGroupAndProjectTranslationsTest {
 
     ProjectTranslationsResponse r = client.getProjectTranslations("demo", "en", ctx).join();
 
-    assertThat(r).isNull();
+    assertThat(r).isNotNull();
+    assertThat(r.getGroups()).isEmpty();
     assertThat(ctx.isNotModified()).isTrue();
   }
 

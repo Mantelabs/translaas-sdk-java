@@ -1,17 +1,28 @@
 # Changelog
 
-Notable changes to this project are listed here. Versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-When you publish a GitHub release, use [`.github/RELEASE_NOTES_TEMPLATE.md`](.github/RELEASE_NOTES_TEMPLATE.md) as the starting point, then move or summarize relevant **Unreleased** items into the release notes for that tag.
-
 ## [Unreleased]
 
 ### Added
 
-- JaCoCo minimum line coverage gate for `translaas-sdk-client` during `./mvnw verify`.
-- Optional Maven profile `integration` with module `translaas-sdk-client-integration-tests` for live API smoke tests (`TRANSLAAS_BASE_URL`, `TRANSLAAS_API_KEY`).
-- GitHub Actions workflow to run integration tests manually with repository secrets.
+- `CacheKeyBuilder` aligned with .NET colon-separated cache keys.
+- `sdkTranslationsPathPrefix` on `TranslaasOptions` (default `/sdk/v1/translations`).
+- `TranslationResponseParsing` for group bare maps and project `flat-json` composite keys.
+- `OfflineCacheDownloadResult.isNotModified()` and `notModified()` factory.
+- `TranslationResponses` empty-model factories for 204/304 parity.
 
-## [0.1.0-SNAPSHOT]
+### Changed
 
-Pre-release development builds; see git history for detail.
+- HTTP **204** returns entry key (text) or empty models (group/project/locales).
+- HTTP **304** without L1 cache returns empty models instead of `null` (breaking for JSON bundle callers).
+- `/text` auto-injects query param `N` when plural `n` is set.
+- Empty `report-missing` skips the HTTP call.
+- API error messages prefer JSON `{ "code", "message" }` when present.
+
+### Fixed
+
+- Shorthand `/text` entry query keys no longer pollute L1 cache keys as interpolation parameters.
+- Uppercase `N` may be passed as an explicit interpolation parameter without conflicting with plural `n`.
+
+### Tracking
+
+- Part of [#47](https://github.com/acuencadev/translaas-sdk-java/issues/47) — Phase A (contract correctness) complete; Phases B–C remain.

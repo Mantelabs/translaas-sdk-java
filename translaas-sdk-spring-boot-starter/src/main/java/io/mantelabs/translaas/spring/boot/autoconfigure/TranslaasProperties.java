@@ -33,6 +33,7 @@ public class TranslaasProperties {
   private boolean useConditionalRequests = true;
   private boolean skipApiValidation;
   private String apiKeyHeader;
+  private String sdkTranslationsPathPrefix;
 
   private final Caching caching = new Caching();
   private final LocaleSettings locale = new LocaleSettings();
@@ -157,6 +158,14 @@ public class TranslaasProperties {
     this.apiKeyHeader = apiKeyHeader;
   }
 
+  public String getSdkTranslationsPathPrefix() {
+    return sdkTranslationsPathPrefix;
+  }
+
+  public void setSdkTranslationsPathPrefix(String sdkTranslationsPathPrefix) {
+    this.sdkTranslationsPathPrefix = sdkTranslationsPathPrefix;
+  }
+
   public Caching getCaching() {
     return caching;
   }
@@ -207,6 +216,9 @@ public class TranslaasProperties {
     }
     if (cacheProvider != null) {
       b.cacheProvider(cacheProvider);
+    }
+    if (sdkTranslationsPathPrefix != null && !sdkTranslationsPathPrefix.isBlank()) {
+      b.sdkTranslationsPathPrefix(sdkTranslationsPathPrefix);
     }
     return b.build();
   }

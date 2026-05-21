@@ -120,6 +120,11 @@ public final class TranslaasOptions {
       return this;
     }
 
+    public Builder sdkTranslationsPathPrefix(String sdkTranslationsPathPrefix) {
+      inner.sdkTranslationsPathPrefix(sdkTranslationsPathPrefix);
+      return this;
+    }
+
     public TranslaasOptions build() {
       return new TranslaasOptions(inner.build());
     }
