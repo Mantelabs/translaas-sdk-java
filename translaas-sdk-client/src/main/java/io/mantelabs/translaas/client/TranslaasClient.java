@@ -59,7 +59,7 @@ import java.util.concurrent.ForkJoinPool;
  * (custom or in-memory). See {@link TranslationResponseCache} for {@code ETag} / {@code 304}
  * behavior.
  */
-public final class TranslaasClient {
+public final class TranslaasClient implements TranslaasTranslationClient {
 
   private static final int BODY_SNIPPET_MAX = 2048;
 
