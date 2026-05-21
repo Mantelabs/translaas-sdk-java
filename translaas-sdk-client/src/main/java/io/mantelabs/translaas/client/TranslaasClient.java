@@ -8,6 +8,7 @@ import io.mantelabs.translaas.models.GroupTranslationsResponse;
 import io.mantelabs.translaas.models.OfflineCacheDownloadResult;
 import io.mantelabs.translaas.models.ProjectLocalesResponse;
 import io.mantelabs.translaas.models.ProjectTranslationsResponse;
+import io.mantelabs.translaas.models.TranslationResponses;
 import io.mantelabs.translaas.models.ReportMissingKeysRequest;
 import io.mantelabs.translaas.models.ValidateApiKeyResponse;
 import io.mantelabs.translaas.models.exception.TranslaasApiException;
@@ -49,7 +50,7 @@ import java.util.concurrent.ForkJoinPool;
  * (see {@link #reportMissingKeys(ReportMissingKeysRequest, TranslaasRequestContext, Executor)}).
  *
  * <p>Offline cache ZIP: {@link #getOfflineCache(String, TranslaasRequestContext, Executor)} —
- * {@code GET} {@value #TRANSLATIONS_OFFLINE_CACHE_PATH} ({@code application/zip}). On {@code 304
+ * {@code GET} {@value #paths.offlineCache()} ({@code application/zip}). On {@code 304
  * Not Modified}, completes with {@code null} and {@link TranslaasRequestContext#isNotModified()} is
  * {@code true} when a context instance was provided.
  *
@@ -58,27 +59,33 @@ import java.util.concurrent.ForkJoinPool;
  * (custom or in-memory). See {@link TranslationResponseCache} for {@code ETag} / {@code 304}
  * behavior.
  */
-public final class TranslaasClient {
+public final class TranslaasClient implements TranslaasTranslationClient {
 
   private static final int BODY_SNIPPET_MAX = 2048;
 
-  /** Path for {@code GET} single translation as {@code text/plain}. */
-  public static final String TRANSLATIONS_TEXT_PATH = "/sdk/v1/translations/text";
+  /** Default-path alias for {@code GET} single translation ({@code text/plain}). */
+  public static final String TRANSLATIONS_TEXT_PATH =
+      SdkTranslationPaths.DEFAULT_PREFIX + "/text";
 
-  /** Path for {@code GET} project locales as {@code application/json}. */
-  public static final String TRANSLATIONS_LOCALES_PATH = "/sdk/v1/translations/locales";
+  /** Default-path alias for {@code GET} project locales. */
+  public static final String TRANSLATIONS_LOCALES_PATH =
+      SdkTranslationPaths.DEFAULT_PREFIX + "/locales";
 
-  /** Path for {@code GET} all translations in one group as {@code application/json}. */
-  public static final String TRANSLATIONS_GROUP_PATH = "/sdk/v1/translations/group";
+  /** Default-path alias for {@code GET} group translations. */
+  public static final String TRANSLATIONS_GROUP_PATH =
+      SdkTranslationPaths.DEFAULT_PREFIX + "/group";
 
-  /** Path for {@code GET} all translations in a project as {@code application/json}. */
-  public static final String TRANSLATIONS_PROJECT_PATH = "/sdk/v1/translations/project";
+  /** Default-path alias for {@code GET} project translations. */
+  public static final String TRANSLATIONS_PROJECT_PATH =
+      SdkTranslationPaths.DEFAULT_PREFIX + "/project";
 
-  /** Path for {@code POST} report missing keys as {@code application/json}. */
-  public static final String TRANSLATIONS_REPORT_MISSING_PATH = "/sdk/v1/translations/report-missing";
+  /** Default-path alias for {@code POST} report missing keys. */
+  public static final String TRANSLATIONS_REPORT_MISSING_PATH =
+      SdkTranslationPaths.DEFAULT_PREFIX + "/report-missing";
 
-  /** Path for {@code GET} offline translation cache as {@code application/zip}. */
-  public static final String TRANSLATIONS_OFFLINE_CACHE_PATH = "/sdk/v1/translations/offline-cache";
+  /** Default-path alias for {@code GET} offline translation cache ZIP. */
+  public static final String TRANSLATIONS_OFFLINE_CACHE_PATH =
+      SdkTranslationPaths.DEFAULT_PREFIX + "/offline-cache";
 
   /** Path for {@code GET} validate API key as {@code application/json} (not under {@code /sdk}). */
   public static final String API_KEYS_VALIDATE_PATH = "/api/v1/api-keys/validate";
@@ -90,6 +97,7 @@ public final class TranslaasClient {
   public static final String FORMAT_FLAT_JSON = "flat-json";
 
   private final TranslaasHttp http;
+  private final SdkTranslationPaths paths;
   private final TranslationResponseCache responseCache;
 
   public TranslaasClient(TranslaasOptions options) {
@@ -98,6 +106,7 @@ public final class TranslaasClient {
 
   TranslaasClient(TranslaasHttp http) {
     this.http = Objects.requireNonNull(http, "http");
+    this.paths = new SdkTranslationPaths(http.getOptions());
     this.responseCache = TranslationResponseCache.maybeCreate(http.getOptions());
   }
 
@@ -181,16 +190,19 @@ public final class TranslaasClient {
         TranslaasUris.mergeQueryParams(http.getOptions(), context, query);
     if (responseCache != null) {
       Optional<TranslaasCacheEntry> cached =
-          responseCache.tryGet(TRANSLATIONS_TEXT_PATH, merged, context);
+          responseCache.tryGet(paths.text(), merged, context);
       if (cached.isPresent()) {
         return TranslationResponseCache.utf8String(cached.get().getValue());
       }
     }
-    HttpResponse<String> response = http.get(TRANSLATIONS_TEXT_PATH, query, context);
+    HttpResponse<String> response = http.get(paths.text(), query, context);
+    if (response.statusCode() == 204) {
+      return TranslationCacheKeys.resolveEntryKey(merged);
+    }
     if (response.statusCode() == 304) {
       if (responseCache != null) {
         Optional<TranslaasCacheEntry> fromCache =
-            responseCache.getIgnoringValidationBypass(TRANSLATIONS_TEXT_PATH, merged);
+            responseCache.getIgnoringValidationBypass(paths.text(), merged);
         if (fromCache.isPresent()) {
           copyEtagFromCacheToContext(context, fromCache.get());
           return TranslationResponseCache.utf8String(fromCache.get().getValue());
@@ -201,7 +213,7 @@ public final class TranslaasClient {
     String body = response.body();
     if (responseCache != null) {
       responseCache.putIfApplicable(
-          TRANSLATIONS_TEXT_PATH,
+          paths.text(),
           merged,
           TranslationResponseCache.utf8Bytes(body != null ? body : ""),
           response.headers().firstValue("ETag"));
@@ -265,17 +277,20 @@ public final class TranslaasClient {
         TranslaasUris.mergeQueryParams(http.getOptions(), context, query);
     if (responseCache != null) {
       Optional<TranslaasCacheEntry> cached =
-          responseCache.tryGet(TRANSLATIONS_LOCALES_PATH, merged, context);
+          responseCache.tryGet(paths.locales(), merged, context);
       if (cached.isPresent()) {
         return readProjectLocales(
             TranslationResponseCache.utf8String(cached.get().getValue()), 200, null);
       }
     }
-    HttpResponse<String> response = http.get(TRANSLATIONS_LOCALES_PATH, query, context);
+    HttpResponse<String> response = http.get(paths.locales(), query, context);
+    if (response.statusCode() == 204) {
+      return TranslationResponses.emptyLocales(project);
+    }
     if (response.statusCode() == 304) {
       if (responseCache != null) {
         Optional<TranslaasCacheEntry> fromCache =
-            responseCache.getIgnoringValidationBypass(TRANSLATIONS_LOCALES_PATH, merged);
+            responseCache.getIgnoringValidationBypass(paths.locales(), merged);
         if (fromCache.isPresent()) {
           copyEtagFromCacheToContext(context, fromCache.get());
           return readProjectLocales(
@@ -284,12 +299,12 @@ public final class TranslaasClient {
               response.uri().toString());
         }
       }
-      return null;
+      return TranslationResponses.emptyLocales(project);
     }
     String body = response.body();
     if (responseCache != null) {
       responseCache.putIfApplicable(
-          TRANSLATIONS_LOCALES_PATH,
+          paths.locales(),
           merged,
           TranslationResponseCache.utf8Bytes(body != null ? body : ""),
           response.headers().firstValue("ETag"));
@@ -379,44 +394,50 @@ public final class TranslaasClient {
         TranslaasUris.mergeQueryParams(http.getOptions(), context, query);
     if (responseCache != null) {
       Optional<TranslaasCacheEntry> cached =
-          responseCache.tryGet(TRANSLATIONS_GROUP_PATH, merged, context);
+          responseCache.tryGet(paths.group(), merged, context);
       if (cached.isPresent()) {
         return readGroupTranslations(
-            TranslationResponseCache.utf8String(cached.get().getValue()), 200, null);
+            TranslationResponseCache.utf8String(cached.get().getValue()), format, 200, null);
       }
     }
-    HttpResponse<String> response = http.get(TRANSLATIONS_GROUP_PATH, query, context);
+    HttpResponse<String> response = http.get(paths.group(), query, context);
+    if (response.statusCode() == 204) {
+      return TranslationResponses.emptyGroup(project, group, lang);
+    }
     if (response.statusCode() == 304) {
       if (responseCache != null) {
         Optional<TranslaasCacheEntry> fromCache =
-            responseCache.getIgnoringValidationBypass(TRANSLATIONS_GROUP_PATH, merged);
+            responseCache.getIgnoringValidationBypass(paths.group(), merged);
         if (fromCache.isPresent()) {
           copyEtagFromCacheToContext(context, fromCache.get());
           return readGroupTranslations(
               TranslationResponseCache.utf8String(fromCache.get().getValue()),
+              format,
               304,
               response.uri().toString());
         }
       }
-      return null;
+      return TranslationResponses.emptyGroup(project, group, lang);
     }
     String body = response.body();
     if (responseCache != null) {
       responseCache.putIfApplicable(
-          TRANSLATIONS_GROUP_PATH,
+          paths.group(),
           merged,
           TranslationResponseCache.utf8Bytes(body != null ? body : ""),
           response.headers().firstValue("ETag"));
     }
     return readGroupTranslations(
-        body != null ? body : "", response.statusCode(), response.uri().toString());
+        body != null ? body : "", format, response.statusCode(), response.uri().toString());
   }
 
   private GroupTranslationsResponse readGroupTranslations(
-      String body, int statusCode, String uriForError) throws TranslaasApiException {
+      String body, String format, int statusCode, String uriForError) throws TranslaasApiException {
     try {
-      return TranslaasJson.mapper().readValue(body, GroupTranslationsResponse.class);
-    } catch (IOException e) {
+      return TranslationResponseParsing.parseGroupResponse(body, format);
+    } catch (TranslaasApiException e) {
+      throw e;
+    } catch (RuntimeException e) {
       throw new TranslaasApiException(
           statusCode,
           snippet(body),
@@ -486,44 +507,51 @@ public final class TranslaasClient {
         TranslaasUris.mergeQueryParams(http.getOptions(), context, query);
     if (responseCache != null) {
       Optional<TranslaasCacheEntry> cached =
-          responseCache.tryGet(TRANSLATIONS_PROJECT_PATH, merged, context);
+          responseCache.tryGet(paths.project(), merged, context);
       if (cached.isPresent()) {
         return readProjectTranslations(
-            TranslationResponseCache.utf8String(cached.get().getValue()), 200, null);
+            TranslationResponseCache.utf8String(cached.get().getValue()), format, 200, null);
       }
     }
-    HttpResponse<String> response = http.get(TRANSLATIONS_PROJECT_PATH, query, context);
+    HttpResponse<String> response = http.get(paths.project(), query, context);
+    if (response.statusCode() == 204) {
+      return TranslationResponses.emptyProject(project, lang);
+    }
     if (response.statusCode() == 304) {
       if (responseCache != null) {
         Optional<TranslaasCacheEntry> fromCache =
-            responseCache.getIgnoringValidationBypass(TRANSLATIONS_PROJECT_PATH, merged);
+            responseCache.getIgnoringValidationBypass(paths.project(), merged);
         if (fromCache.isPresent()) {
           copyEtagFromCacheToContext(context, fromCache.get());
           return readProjectTranslations(
               TranslationResponseCache.utf8String(fromCache.get().getValue()),
+              format,
               304,
               response.uri().toString());
         }
       }
-      return null;
+      return TranslationResponses.emptyProject(project, lang);
     }
     String body = response.body();
     if (responseCache != null) {
       responseCache.putIfApplicable(
-          TRANSLATIONS_PROJECT_PATH,
+          paths.project(),
           merged,
           TranslationResponseCache.utf8Bytes(body != null ? body : ""),
           response.headers().firstValue("ETag"));
     }
     return readProjectTranslations(
-        body != null ? body : "", response.statusCode(), response.uri().toString());
+        body != null ? body : "", format, response.statusCode(), response.uri().toString());
   }
 
   private ProjectTranslationsResponse readProjectTranslations(
-      String body, int statusCode, String uriForError) throws TranslaasApiException {
+      String body, String format, int statusCode, String uriForError)
+      throws TranslaasApiException {
     try {
-      return TranslaasJson.mapper().readValue(body, ProjectTranslationsResponse.class);
-    } catch (IOException e) {
+      return TranslationResponseParsing.parseProjectResponse(body, format);
+    } catch (TranslaasApiException e) {
+      throw e;
+    } catch (RuntimeException e) {
       throw new TranslaasApiException(
           statusCode,
           snippet(body),
@@ -616,6 +644,9 @@ public final class TranslaasClient {
   private void reportMissingKeysBlocking(ReportMissingKeysRequest request, TranslaasRequestContext context)
       throws TranslaasApiException {
     Objects.requireNonNull(request, "request");
+    if (request.getKeys() == null || request.getKeys().isEmpty()) {
+      return;
+    }
     if (context != null) {
       context.clearResponseMetadata();
     }
@@ -625,7 +656,7 @@ public final class TranslaasClient {
     } catch (JsonProcessingException e) {
       throw new TranslaasApiException(0, null, "Failed to serialize report-missing request body", e);
     }
-    http.post(TRANSLATIONS_REPORT_MISSING_PATH, null, json, null, context);
+    http.post(paths.reportMissing(), null, json, null, context);
   }
 
   /**
@@ -677,30 +708,30 @@ public final class TranslaasClient {
         TranslaasUris.mergeQueryParams(http.getOptions(), context, query);
     if (responseCache != null) {
       Optional<TranslaasCacheEntry> cached =
-          responseCache.tryGet(TRANSLATIONS_OFFLINE_CACHE_PATH, merged, context);
+          responseCache.tryGet(paths.offlineCache(), merged, context);
       if (cached.isPresent()) {
         byte[] b = cached.get().getValue();
         return new OfflineCacheDownloadResult(b != null ? b : new byte[0], null);
       }
     }
     HttpResponse<byte[]> response =
-        http.getBytes(TRANSLATIONS_OFFLINE_CACHE_PATH, query, context);
+        http.getBytes(paths.offlineCache(), query, context);
     if (response.statusCode() == 304) {
       if (responseCache != null) {
         Optional<TranslaasCacheEntry> fromCache =
-            responseCache.getIgnoringValidationBypass(TRANSLATIONS_OFFLINE_CACHE_PATH, merged);
+            responseCache.getIgnoringValidationBypass(paths.offlineCache(), merged);
         if (fromCache.isPresent()) {
           copyEtagFromCacheToContext(context, fromCache.get());
           byte[] b = fromCache.get().getValue();
           return new OfflineCacheDownloadResult(b != null ? b : new byte[0], null);
         }
       }
-      return null;
+      return OfflineCacheDownloadResult.notModified();
     }
     byte[] body = response.body();
     if (responseCache != null) {
       responseCache.putIfApplicable(
-          TRANSLATIONS_OFFLINE_CACHE_PATH,
+          paths.offlineCache(),
           merged,
           body != null ? body : new byte[0],
           response.headers().firstValue("ETag"));

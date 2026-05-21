@@ -33,7 +33,9 @@ public final class TranslaasOptions {
   private final boolean useConditionalRequests;
   private final boolean skipApiValidation;
   private final String apiKeyHeader;
+  private final String sdkTranslationsPathPrefix;
   private final TranslaasCacheProvider cacheProvider;
+  private final OfflineCacheOptions offlineCache;
 
   public String getApiKey() {
     return apiKey;
@@ -111,6 +113,19 @@ public final class TranslaasOptions {
     return Optional.ofNullable(cacheProvider);
   }
 
+  /**
+   * Prefix for SDK translation routes (default {@value SdkTranslationPaths#DEFAULT_PREFIX}).
+   * Paths are built as {@code {prefix}/text}, {@code {prefix}/group}, etc.
+   */
+  public String getSdkTranslationsPathPrefix() {
+    return sdkTranslationsPathPrefix;
+  }
+
+  /** Offline file cache configuration; {@code null} when offline mode is disabled. */
+  public OfflineCacheOptions getOfflineCache() {
+    return offlineCache;
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -132,7 +147,9 @@ public final class TranslaasOptions {
     private boolean useConditionalRequests = true;
     private boolean skipApiValidation;
     private String apiKeyHeader;
+    private String sdkTranslationsPathPrefix = SdkTranslationPaths.DEFAULT_PREFIX;
     private TranslaasCacheProvider cacheProvider;
+    private OfflineCacheOptions offlineCache;
 
     private Builder() {}
 
@@ -224,6 +241,16 @@ public final class TranslaasOptions {
       return this;
     }
 
+    public Builder sdkTranslationsPathPrefix(String sdkTranslationsPathPrefix) {
+      this.sdkTranslationsPathPrefix = sdkTranslationsPathPrefix;
+      return this;
+    }
+
+    public Builder offlineCache(OfflineCacheOptions offlineCache) {
+      this.offlineCache = offlineCache;
+      return this;
+    }
+
     public TranslaasOptions build() {
       if (apiKey == null || apiKey.isBlank()) {
         throw new TranslaasConfigurationException("apiKey is required");
@@ -251,6 +278,9 @@ public final class TranslaasOptions {
     this.useConditionalRequests = builder.useConditionalRequests;
     this.skipApiValidation = builder.skipApiValidation;
     this.apiKeyHeader = builder.apiKeyHeader != null ? builder.apiKeyHeader : DEFAULT_API_KEY_HEADER;
+    this.sdkTranslationsPathPrefix =
+        SdkTranslationPaths.normalizePrefix(builder.sdkTranslationsPathPrefix);
     this.cacheProvider = builder.cacheProvider;
+    this.offlineCache = builder.offlineCache;
   }
 }

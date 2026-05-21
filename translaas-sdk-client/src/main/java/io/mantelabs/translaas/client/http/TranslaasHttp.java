@@ -132,10 +132,12 @@ public final class TranslaasHttp {
         return response;
       }
       if (response.statusCode() >= 400) {
+        String snippet = errorBodySnippet(response.body());
         throw new TranslaasApiException(
             response.statusCode(),
-            errorBodySnippet(response.body()),
-            "HTTP " + response.statusCode() + " " + response.uri());
+            snippet,
+            TranslaasApiErrorMessages.fromStatusAndBody(
+                response.statusCode(), snippet, response.uri().toString()));
       }
       return response;
     } catch (IOException e) {

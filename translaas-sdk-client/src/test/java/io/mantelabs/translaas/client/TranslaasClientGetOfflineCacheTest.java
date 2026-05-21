@@ -39,7 +39,7 @@ class TranslaasClientGetOfflineCacheTest {
   }
 
   @Test
-  void getOfflineCache_setsNotModifiedAndReturnsNull_when304(WireMockRuntimeInfo wm) {
+  void getOfflineCache_setsNotModifiedAndReturnsEmptyResult_when304(WireMockRuntimeInfo wm) {
     wm.getWireMock()
         .register(
             get(urlPathEqualTo(TranslaasClient.TRANSLATIONS_OFFLINE_CACHE_PATH))
@@ -60,7 +60,9 @@ class TranslaasClientGetOfflineCacheTest {
 
     OfflineCacheDownloadResult r = client.getOfflineCache("demo", ctx).join();
 
-    assertThat(r).isNull();
+    assertThat(r).isNotNull();
+    assertThat(r.isNotModified()).isTrue();
+    assertThat(r.getZipBytes()).isEmpty();
     assertThat(ctx.isNotModified()).isTrue();
   }
 

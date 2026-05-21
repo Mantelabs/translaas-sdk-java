@@ -1,7 +1,14 @@
 package io.mantelabs.translaas;
 
-import io.mantelabs.translaas.client.TranslaasClient;
+import io.mantelabs.translaas.caching.file.TranslaasClients;
 import io.mantelabs.translaas.client.TranslaasRequestContext;
+import io.mantelabs.translaas.client.TranslaasTranslationClient;
+import io.mantelabs.translaas.models.GroupTranslationsResponse;
+import io.mantelabs.translaas.models.OfflineCacheDownloadResult;
+import io.mantelabs.translaas.models.ProjectLocalesResponse;
+import io.mantelabs.translaas.models.ProjectTranslationsResponse;
+import io.mantelabs.translaas.models.ReportMissingKeysRequest;
+import io.mantelabs.translaas.models.ValidateApiKeyResponse;
 import io.mantelabs.translaas.models.exception.TranslaasConfigurationException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,7 +31,7 @@ import java.util.concurrent.Executor;
  */
 public final class TranslaasService {
 
-  private final TranslaasClient client;
+  private final TranslaasTranslationClient client;
   private final io.mantelabs.translaas.client.TranslaasOptions clientOptions;
   private final List<LanguageResolver> languageResolvers;
 
@@ -42,7 +49,7 @@ public final class TranslaasService {
    */
   public TranslaasService(TranslaasOptions options, List<LanguageResolver> languageResolvers) {
     this(
-        new TranslaasClient(Objects.requireNonNull(options, "options").asClientOptions()),
+        TranslaasClients.create(Objects.requireNonNull(options, "options").asClientOptions()),
         options.asClientOptions(),
         languageResolvers);
   }
@@ -63,7 +70,7 @@ public final class TranslaasService {
    * configuration (used for default language fallback).
    */
   public TranslaasService(
-      TranslaasClient client,
+      TranslaasTranslationClient client,
       io.mantelabs.translaas.client.TranslaasOptions clientOptions,
       List<LanguageResolver> languageResolvers) {
     this.client = Objects.requireNonNull(client, "client");
@@ -126,8 +133,35 @@ public final class TranslaasService {
     return getEntry(group, entry, lang, pluralN, parameters, context, executor);
   }
 
-  public TranslaasClient getClient() {
+  /** Returns the underlying client (plain HTTP or offline-decorated). */
+  public TranslaasTranslationClient getClient() {
     return client;
+  }
+
+  public CompletableFuture<GroupTranslationsResponse> getGroupTranslations(
+      String project, String group, String lang) {
+    return client.getGroupTranslations(project, group, lang);
+  }
+
+  public CompletableFuture<ProjectTranslationsResponse> getProjectTranslations(
+      String project, String lang) {
+    return client.getProjectTranslations(project, lang);
+  }
+
+  public CompletableFuture<ProjectLocalesResponse> getProjectLocales(String project) {
+    return client.getProjectLocales(project);
+  }
+
+  public CompletableFuture<OfflineCacheDownloadResult> getOfflineCache(String project) {
+    return client.getOfflineCache(project);
+  }
+
+  public CompletableFuture<Void> reportMissingKeys(ReportMissingKeysRequest request) {
+    return client.reportMissingKeys(request);
+  }
+
+  public CompletableFuture<ValidateApiKeyResponse> validateApiKey() {
+    return client.validateApiKey();
   }
 
   public List<LanguageResolver> getLanguageResolvers() {

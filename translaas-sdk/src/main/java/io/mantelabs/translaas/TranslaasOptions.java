@@ -120,6 +120,16 @@ public final class TranslaasOptions {
       return this;
     }
 
+    public Builder sdkTranslationsPathPrefix(String sdkTranslationsPathPrefix) {
+      inner.sdkTranslationsPathPrefix(sdkTranslationsPathPrefix);
+      return this;
+    }
+
+    public Builder offlineCache(io.mantelabs.translaas.client.OfflineCacheOptions offlineCache) {
+      inner.offlineCache(offlineCache);
+      return this;
+    }
+
     public TranslaasOptions build() {
       return new TranslaasOptions(inner.build());
     }

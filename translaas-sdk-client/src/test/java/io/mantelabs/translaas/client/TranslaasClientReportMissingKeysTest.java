@@ -3,7 +3,9 @@ package io.mantelabs.translaas.client;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -87,6 +89,13 @@ class TranslaasClientReportMissingKeysTest {
   }
 
   @Test
+  void reportMissingKeys_emptyKeys_skipsHttp(WireMockRuntimeInfo wm) {
+    TranslaasClient client = clientForPort(wm.getHttpPort());
+    client.reportMissingKeys(new ReportMissingKeysRequest(List.of())).join();
+    verify(0, postRequestedFor(urlPathEqualTo(TranslaasClient.TRANSLATIONS_REPORT_MISSING_PATH)));
+  }
+
+  @Test
   void reportMissingKeys_throwsTranslaasApiException_when401(WireMockRuntimeInfo wm) {
     wm.getWireMock()
         .register(
@@ -94,7 +103,8 @@ class TranslaasClientReportMissingKeysTest {
                 .willReturn(aResponse().withStatus(401).withBody("unauthorized")));
 
     TranslaasClient client = clientForPort(wm.getHttpPort());
-    ReportMissingKeysRequest req = new ReportMissingKeysRequest(List.of());
+    ReportMissingKeysRequest req =
+        new ReportMissingKeysRequest(List.of(new ReportMissingKeyItemRequest("g", "k", "en")));
 
     assertThatThrownBy(() -> client.reportMissingKeys(req).join())
         .hasCauseInstanceOf(TranslaasApiException.class)

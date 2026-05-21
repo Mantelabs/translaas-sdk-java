@@ -68,7 +68,7 @@ class TranslaasClientGetProjectLocalesTest {
   }
 
   @Test
-  void getProjectLocales_setsNotModifiedAndReturnsNull_when304(WireMockRuntimeInfo wm) {
+  void getProjectLocales_setsNotModifiedAndReturnsEmpty_when304(WireMockRuntimeInfo wm) {
     wm.getWireMock()
         .register(
             get(urlPathEqualTo(TranslaasClient.TRANSLATIONS_LOCALES_PATH))
@@ -89,7 +89,8 @@ class TranslaasClientGetProjectLocalesTest {
 
     ProjectLocalesResponse r = client.getProjectLocales("demo", ctx).join();
 
-    assertThat(r).isNull();
+    assertThat(r).isNotNull();
+    assertThat(r.getLocales()).isEmpty();
     assertThat(ctx.isNotModified()).isTrue();
   }
 

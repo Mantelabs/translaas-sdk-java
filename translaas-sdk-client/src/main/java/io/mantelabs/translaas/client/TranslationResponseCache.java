@@ -3,7 +3,6 @@ package io.mantelabs.translaas.client;
 import io.mantelabs.translaas.caching.MemoryTranslaasCacheProvider;
 import io.mantelabs.translaas.caching.TranslaasCacheEntry;
 import io.mantelabs.translaas.caching.TranslaasCacheProvider;
-import io.mantelabs.translaas.client.http.TranslaasUris;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.LinkedHashMap;
@@ -11,25 +10,19 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * L1 response cache for {@link TranslaasClient}: keys match merged query parameters (project,
- * group, entry, lang, channel, version, includeContext, etc.) plus API path.
- *
- * <p><strong>304 Not Modified:</strong> when the transport returns {@code 304}, the client uses a
- * cached body for the same logical key if present; otherwise it keeps the existing empty / {@code
- * null} result semantics. Cached entries store the {@code ETag} from prior {@code 200} responses
- * when {@link TranslaasOptions#isUseConditionalRequests()} is enabled.
- *
- * <p><strong>Conditional requests:</strong> if {@link TranslaasRequestContext#getIfNoneMatch()} is
- * set, cache reads are skipped so the server can validate or return {@code 304}; a cached body may
- * still be used to satisfy a {@code 304} response as above.
+ * L1 response cache for {@link TranslaasClient}: keys use {@link
+ * io.mantelabs.translaas.caching.CacheKeyBuilder} (parity with .NET).
  */
 final class TranslationResponseCache {
 
   private final TranslaasOptions options;
+  private final SdkTranslationPaths paths;
   private final TranslaasCacheProvider provider;
 
-  private TranslationResponseCache(TranslaasOptions options, TranslaasCacheProvider provider) {
+  private TranslationResponseCache(
+      TranslaasOptions options, SdkTranslationPaths paths, TranslaasCacheProvider provider) {
     this.options = Objects.requireNonNull(options, "options");
+    this.paths = Objects.requireNonNull(paths, "paths");
     this.provider = Objects.requireNonNull(provider, "provider");
   }
 
@@ -38,9 +31,10 @@ final class TranslationResponseCache {
     if (options.getCacheMode() == CacheMode.NONE) {
       return null;
     }
+    SdkTranslationPaths paths = new SdkTranslationPaths(options);
     TranslaasCacheProvider p =
         options.getCacheProvider().orElseGet(MemoryTranslaasCacheProvider::new);
-    return new TranslationResponseCache(options, p);
+    return new TranslationResponseCache(options, paths, p);
   }
 
   boolean cachesPath(String path) {
@@ -48,16 +42,15 @@ final class TranslationResponseCache {
       case NONE:
         return false;
       case ENTRY:
-        return TranslaasClient.TRANSLATIONS_TEXT_PATH.equals(path);
+        return paths.text().equals(path);
       case GROUP:
-        return TranslaasClient.TRANSLATIONS_TEXT_PATH.equals(path)
-            || TranslaasClient.TRANSLATIONS_GROUP_PATH.equals(path);
+        return paths.text().equals(path) || paths.group().equals(path);
       case PROJECT:
-        return TranslaasClient.TRANSLATIONS_TEXT_PATH.equals(path)
-            || TranslaasClient.TRANSLATIONS_GROUP_PATH.equals(path)
-            || TranslaasClient.TRANSLATIONS_PROJECT_PATH.equals(path)
-            || TranslaasClient.TRANSLATIONS_LOCALES_PATH.equals(path)
-            || TranslaasClient.TRANSLATIONS_OFFLINE_CACHE_PATH.equals(path);
+        return paths.text().equals(path)
+            || paths.group().equals(path)
+            || paths.project().equals(path)
+            || paths.locales().equals(path)
+            || paths.offlineCache().equals(path);
       default:
         return false;
     }
@@ -140,8 +133,22 @@ final class TranslationResponseCache {
   }
 
   static String cacheKey(String path, LinkedHashMap<String, String> mergedQuery) {
-    String q = TranslaasUris.buildQueryString(mergedQuery);
-    return path + "\u0000" + q;
+    if (path.endsWith("/text")) {
+      return TranslationCacheKeys.forTextPath(mergedQuery);
+    }
+    if (path.endsWith("/group")) {
+      return TranslationCacheKeys.forGroupPath(mergedQuery);
+    }
+    if (path.endsWith("/project")) {
+      return TranslationCacheKeys.forProjectPath(mergedQuery);
+    }
+    if (path.endsWith("/locales")) {
+      return TranslationCacheKeys.forLocalesPath(mergedQuery);
+    }
+    if (path.endsWith("/offline-cache")) {
+      return TranslationCacheKeys.forOfflinePath(mergedQuery);
+    }
+    throw new IllegalArgumentException("Unsupported cache path: " + path);
   }
 
   static byte[] utf8Bytes(String s) {

@@ -29,7 +29,6 @@ public final class TranslationTextQueries {
           "lang",
           "entry",
           "n",
-          "N",
           "project",
           "channel",
           "v",
@@ -88,6 +87,9 @@ public final class TranslationTextQueries {
       LinkedHashMap<String, String> q, BigDecimal n, Map<String, String> interpolationParameters) {
     if (n != null) {
       q.put("n", n.toPlainString());
+      if (!q.containsKey("N") && !hasKeyIgnoreCase(interpolationParameters, "N")) {
+        q.put("N", n.toPlainString());
+      }
     }
     if (interpolationParameters == null || interpolationParameters.isEmpty()) {
       return;
@@ -98,12 +100,45 @@ public final class TranslationTextQueries {
       if (key == null || value == null) {
         continue;
       }
-      if (RESERVED_QUERY_KEYS.contains(key.toLowerCase(Locale.ROOT))) {
+      if (isReservedInterpolationName(key)) {
         throw new IllegalArgumentException(
             "Interpolation parameter name must not match a reserved query key (case-insensitive): "
                 + key);
       }
       q.put(key, value);
     }
+  }
+
+  private static boolean hasKeyIgnoreCase(
+      LinkedHashMap<String, String> q, String name) {
+    if (q == null) {
+      return false;
+    }
+    for (String key : q.keySet()) {
+      if (key != null && key.equalsIgnoreCase(name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private static boolean isReservedInterpolationName(String key) {
+    if (key == null) {
+      return false;
+    }
+    String lower = key.toLowerCase(Locale.ROOT);
+    return RESERVED_QUERY_KEYS.contains(lower) && !"n".equals(lower);
+  }
+
+  private static boolean hasKeyIgnoreCase(Map<String, String> map, String name) {
+    if (map == null) {
+      return false;
+    }
+    for (String key : map.keySet()) {
+      if (key != null && key.equalsIgnoreCase(name)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
