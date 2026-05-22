@@ -40,6 +40,7 @@ Use the **Maven Wrapper** (`mvnw` / `mvnw.cmd`) so the build matches CI and you 
   On PowerShell, set `$env:TRANSLAAS_BASE_URL` and `$env:TRANSLAAS_API_KEY` instead of `export`.
   If those variables are unset, the live test class is skipped and the build still succeeds. In **GitHub Actions**, use repository secrets with the same names and run the **Integration tests** workflow manually (`.github/workflows/integration-tests.yml`).
 - User-facing release notes for maintainers: see **`CHANGELOG.md`** and [`.github/RELEASE_NOTES_TEMPLATE.md`](.github/RELEASE_NOTES_TEMPLATE.md).
+- Maven Central setup and publish steps: **[`docs/MAVEN_CENTRAL_SETUP.md`](docs/MAVEN_CENTRAL_SETUP.md)**.
 
 ## Pull requests
 
