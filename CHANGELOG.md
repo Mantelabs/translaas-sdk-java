@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.3.0-beta-SNAPSHOT] - 2026-05-21
+## [0.4.0-beta-SNAPSHOT] - 2026-05-22
 
 ### Added
 
@@ -24,7 +24,7 @@
 - `/text` auto-injects query param `N` when plural `n` is set.
 - Empty `report-missing` skips the HTTP call.
 - API error messages prefer JSON `{ "code", "message" }` when present.
-- Version line aligned with JS/Python **0.3.0-beta**.
+- Version line bumped to **0.4.0-beta-SNAPSHOT** (SDK v1 parity phases A–C for issue #47).
 
 ### Fixed
 

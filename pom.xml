@@ -6,7 +6,7 @@
 
   <groupId>io.mantelabs</groupId>
   <artifactId>translaas-sdk-parent</artifactId>
-  <version>0.3.0-beta-SNAPSHOT</version>
+  <version>0.4.0-beta-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Translaas SDK Parent</name>
