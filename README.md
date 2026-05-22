@@ -8,7 +8,7 @@ GitHub stars
 
 A strongly typed, modular Java SDK for consuming the **Translaas Translation Delivery API**. Use it to fetch translations in JVM applications with compile-time safety and familiar Java APIs.
 
-Published artifacts use the **`io.mantelabs`** group ID. Example `baseUrl` values below assume the hosted API at **`https://api.mantelabs.com`**; use whatever origin matches your deployment.
+Published artifacts use the **`com.mantelabs`** group ID (reverse-DNS for [mantelabs.com](https://mantelabs.com)). Example `baseUrl` values below assume the hosted API at **`https://api.mantelabs.com`**; use whatever origin matches your deployment.
 
 ## Features
 
@@ -32,7 +32,7 @@ Published artifacts use the **`io.mantelabs`** group ID. Example `baseUrl` value
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>com.mantelabs</groupId>
   <artifactId>translaas-sdk</artifactId>
   <version>x.y.z</version><!-- replace with the current version from Maven Central -->
 </dependency>
@@ -42,7 +42,7 @@ Published artifacts use the **`io.mantelabs`** group ID. Example `baseUrl` value
 
 ```kotlin
 dependencies {
-    implementation("io.mantelabs:translaas-sdk:x.y.z") // replace with the current version from Maven Central
+    implementation("com.mantelabs:translaas-sdk:x.y.z") // replace with the current version from Maven Central
 }
 ```
 
@@ -50,7 +50,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'io.mantelabs:translaas-sdk:+'
+    implementation 'com.mantelabs:translaas-sdk:+'
 }
 ```
 
@@ -64,7 +64,7 @@ If a BOM is published for aligned versions:
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>io.mantelabs</groupId>
+      <groupId>com.mantelabs</groupId>
       <artifactId>translaas-sdk-bom</artifactId>
       <version>x.y.z</version>
       <type>pom</type>
@@ -275,9 +275,9 @@ Add **`translaas-sdk-spring-boot-starter`** alongside **`spring-boot-starter`** 
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>com.mantelabs</groupId>
   <artifactId>translaas-sdk-spring-boot-starter</artifactId>
-  <version>x.y.z</version><!-- align with other io.mantelabs artifacts -->
+  <version>x.y.z</version><!-- align with other com.mantelabs artifacts -->
 </dependency>
 ```
 
@@ -309,7 +309,7 @@ Add **`translaas-sdk-thymeleaf-spring-boot-starter`** alongside **`translaas-sdk
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>com.mantelabs</groupId>
   <artifactId>translaas-sdk-thymeleaf-spring-boot-starter</artifactId>
   <version>x.y.z</version>
 </dependency>

@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.mantelabs</groupId>
+    <groupId>com.mantelabs</groupId>
     <artifactId>translaas-sdk-parent</artifactId>
     <version>0.4.0-beta</version>
     <relativePath>../pom.xml</relativePath>
@@ -17,7 +17,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>io.mantelabs</groupId>
+      <groupId>com.mantelabs</groupId>
       <artifactId>translaas-sdk-models</artifactId>
     </dependency>
     <dependency>

@@ -16,11 +16,11 @@ Summarize this release in a few sentences: scope (e.g. beta / GA), alignment wit
 
 ## 📦 Artifacts published
 
-- **`io.mantelabs:translaas-sdk:VERSION`** — [Maven Central](https://central.sonatype.com/search?q=g:io.mantelabs+translaas-sdk)
+- **`com.mantelabs:translaas-sdk:VERSION`** — [Maven Central](https://central.sonatype.com/search?q=g:com.mantelabs+translaas-sdk)
 
 <!-- Optional: additional modules or BOM -->
 
-- **`io.mantelabs:translaas-sdk-bom:VERSION`** (if applicable)
+- **`com.mantelabs:translaas-sdk-bom:VERSION`** (if applicable)
 
 ## 📥 Install
 
@@ -28,7 +28,7 @@ Summarize this release in a few sentences: scope (e.g. beta / GA), alignment wit
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>com.mantelabs</groupId>
   <artifactId>translaas-sdk</artifactId>
   <version>VERSION</version>
 </dependency>
@@ -38,7 +38,7 @@ Summarize this release in a few sentences: scope (e.g. beta / GA), alignment wit
 
 ```kotlin
 dependencies {
-    implementation("io.mantelabs:translaas-sdk:VERSION")
+    implementation("com.mantelabs:translaas-sdk:VERSION")
 }
 ```
 
