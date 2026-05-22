@@ -8,7 +8,7 @@ GitHub stars
 
 A strongly typed, modular Java SDK for consuming the **Translaas Translation Delivery API**. Use it to fetch translations in JVM applications with compile-time safety and familiar Java APIs.
 
-Published artifacts use the `**io.mantelabs`** group ID (reverse-DNS for [mantelabs.io](https://mantelabs.io)). Example `baseUrl` values below assume the hosted API at `**https://api.mantelabs.io**`; use whatever origin matches your deployment.
+Published artifacts use the **`io.mantelabs`** group ID. Example `baseUrl` values below assume the hosted API at **`https://api.mantelabs.com`**; use whatever origin matches your deployment.
 
 ## Features
 
@@ -103,7 +103,7 @@ import io.mantelabs.translaas.TranslaasService;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.mantelabs.com")
     .cacheMode(CacheMode.GROUP)
     .build();
 
@@ -132,7 +132,7 @@ import io.mantelabs.translaas.client.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.mantelabs.com")
     .build();
 
 TranslaasClient client = new TranslaasClient(options);
@@ -153,7 +153,7 @@ import io.mantelabs.translaas.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.mantelabs.com")
     .build();
 
 TranslaasService translaas = new TranslaasService(options);
@@ -169,7 +169,7 @@ import java.time.Duration;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.mantelabs.com")
     .defaultLanguage(LanguageCodes.ENGLISH)
     .cacheMode(CacheMode.GROUP)
     .cacheAbsoluteExpiration(Duration.ofHours(1))
@@ -232,7 +232,7 @@ import io.mantelabs.translaas.client.TranslaasOptions;
 TranslaasOptions offlineAware =
     TranslaasOptions.builder()
         .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-        .baseUrl("https://api.mantelabs.io")
+        .baseUrl("https://api.mantelabs.com")
         .skipApiValidation(true)
         .build();
 ```
@@ -244,7 +244,7 @@ Typical mappings (names may match other Translaas SDKs):
 ```bash
 # Shell / container
 export TRANSLAAS_API_KEY=your-api-key
-export TRANSLAAS_BASE_URL=https://api.mantelabs.io
+export TRANSLAAS_BASE_URL=https://api.mantelabs.com
 export TRANSLAAS_CACHE_MODE=GROUP
 export TRANSLAAS_DEFAULT_LANGUAGE=en
 ```
@@ -255,7 +255,7 @@ import io.mantelabs.translaas.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl(System.getenv().getOrDefault("TRANSLAAS_BASE_URL", "https://api.mantelabs.io"))
+    .baseUrl(System.getenv().getOrDefault("TRANSLAAS_BASE_URL", "https://api.mantelabs.com"))
     .cacheMode(CacheMode.valueOf(System.getenv().getOrDefault("TRANSLAAS_CACHE_MODE", "NONE")))
     .defaultLanguage(System.getenv("TRANSLAAS_DEFAULT_LANGUAGE"))
     .build();
@@ -286,7 +286,7 @@ Add **`translaas-sdk-spring-boot-starter`** alongside **`spring-boot-starter`** 
 ```yaml
 translaas:
   api-key: ${TRANSLAAS_API_KEY}
-  base-url: https://api.mantelabs.io
+  base-url: https://api.mantelabs.com
 ```
 
 Required keys match programmatic **`TranslaasOptions`**: `api-key` and `base-url`. Other settings use the same names as in the **Configuration options** table under [Configuration](#configuration) (kebab-case in YAML), for example `cache-mode`, `default-language`, `timeout`, `channel`, `skip-api-validation`.
@@ -320,7 +320,7 @@ Add **`translaas-sdk-thymeleaf-spring-boot-starter`** alongside **`translaas-sdk
 ```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:translaas="https://translaas.mantelabs.io">
+      xmlns:translaas="https://translaas.mantelabs.com">
 <body>
   <p><translaas:text group="common" entry="welcome"/></p>
   <p><translaas:text group="common" entry="hello" lang="fr" number="3" params='{"name":"Ada"}'/></p>
@@ -384,7 +384,7 @@ TranslaasClient client =
     new TranslaasClient(
         TranslaasOptions.builder()
             .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-            .baseUrl("https://api.mantelabs.io")
+            .baseUrl("https://api.mantelabs.com")
             .build());
 
 try {
@@ -428,7 +428,7 @@ The repository is **Maven-first**: use the committed wrapper (`mvnw` / `mvnw.cmd
 
 ## API endpoints
 
-The SDK talks to the Translaas HTTP API. `baseUrl` must be the origin only (for example `https://api.mantelabs.io`).
+The SDK talks to the Translaas HTTP API. `baseUrl` must be the origin only (for example `https://api.mantelabs.com`).
 
 
 | Endpoint                              | Method | Purpose                                     |
@@ -453,7 +453,7 @@ import io.mantelabs.translaas.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.mantelabs.com")
     .build();
 ```
 
@@ -474,9 +474,9 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ## Support
 
-- **Website**: [https://mantelabs.io](https://mantelabs.io)
+- **Website**: [https://mantelabs.com](https://mantelabs.com)
 - **Issues**: [https://github.com/Mantelabs/translaas-sdk-java/issues](https://github.com/Mantelabs/translaas-sdk-java/issues)
-- **Documentation**: published on [mantelabs.io](https://mantelabs.io) when available
+- **Documentation**: published on [mantelabs.com](https://mantelabs.com) when available
 
 ## Contributing
 

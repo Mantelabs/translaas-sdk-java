@@ -7,7 +7,7 @@ This is an open-source **Java** SDK for the **Translaas Translation Delivery API
 **Repository type**: Java SDK library  
 **Languages**: Java  
 **JDK**: **11+** (baseline; match `maven-compiler-plugin` / CI matrix)  
-**Coordinates**: `io.mantelabs` (reverse-DNS for [mantelabs.io](https://mantelabs.io))  
+**Coordinates**: `io.mantelabs` — [mantelabs.com](https://mantelabs.com)
 **Base package**: `io.mantelabs.translaas`  
 **Build system**: **Maven** (prefer `./mvnw` when the wrapper is present)  
 **Tests**: **JUnit 5** (JUnit Jupiter), **Mockito** / **AssertJ** as configured in the parent POM  

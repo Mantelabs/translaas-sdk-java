@@ -10,7 +10,7 @@ import org.thymeleaf.processor.IProcessor;
 public final class TranslaasDialect extends AbstractProcessorDialect {
 
   /** XML namespace for {@code translaas:*} elements and (future) attributes. */
-  public static final String NAMESPACE_URI = "https://translaas.mantelabs.io";
+  public static final String NAMESPACE_URI = "https://translaas.mantelabs.com";
 
   public static final String PREFIX = "translaas";
 

@@ -55,7 +55,7 @@ import io.mantelabs.translaas.client.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.mantelabs.com")
     .build();
 
 TranslaasClient client = new TranslaasClient(options);

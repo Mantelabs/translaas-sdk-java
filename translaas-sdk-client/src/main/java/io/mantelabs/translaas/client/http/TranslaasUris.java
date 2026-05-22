@@ -25,7 +25,7 @@ public final class TranslaasUris {
     Objects.requireNonNull(uri, "uri");
     if (uri.getScheme() == null || uri.getHost() == null) {
       throw new TranslaasConfigurationException(
-          "baseUrl must be an absolute URI with scheme and host (e.g. https://api.mantelabs.io)");
+          "baseUrl must be an absolute URI with scheme and host (e.g. https://api.mantelabs.com)");
     }
     String scheme = uri.getScheme();
     String host = uri.getHost();
