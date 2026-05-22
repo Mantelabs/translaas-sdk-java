@@ -7,7 +7,7 @@
   <parent>
     <groupId>io.mantelabs</groupId>
     <artifactId>translaas-sdk-parent</artifactId>
-    <version>0.3.0-beta-SNAPSHOT</version>
+    <version>0.4.0-beta-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
