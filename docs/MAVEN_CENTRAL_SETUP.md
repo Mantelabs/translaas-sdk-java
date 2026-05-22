@@ -6,7 +6,9 @@ Quick reference for publishing **`io.mantelabs:*`** artifacts from [translaas-sd
 
 ### 1. Sonatype Central (OSSRH)
 
-1. Create a [Sonatype Central](https://central.sonatype.com/) account and register namespace **`io.mantelabs`** (verify domain or GitHub org ownership).
+1. Create a [Sonatype Central](https://central.sonatype.com/) account and register namespace **`io.mantelabs`**.
+   - Verify ownership of **`mantelabs.com`** (DNS TXT record on the domain) or link your GitHub org if Central accepts that path for the namespace.
+   - The root POM **`organizationUrl`** is **`https://mantelabs.com`**; keep Central namespace metadata aligned with that domain.
 2. Generate a **user token** for publishing (Central Portal → Account → Generate user token).
 3. Store the token as GitHub Environment secrets on **`translaas-sdk-java`**:
 
