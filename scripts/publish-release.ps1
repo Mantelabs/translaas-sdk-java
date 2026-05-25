@@ -55,7 +55,7 @@ git push origin $tag
 Write-Host "Creating GitHub Release $tag ..."
 gh release create $tag `
     --repo acuencadev/translaas-sdk-java `
-    --title "Release $tag — SDK v1 API parity (beta)" `
+    --title "Release $tag - SDK v1 API parity (beta)" `
     --notes-file $notesFile
 
 if (-not $SkipWorkflow) {
