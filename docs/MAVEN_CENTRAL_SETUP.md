@@ -9,7 +9,7 @@ Quick reference for publishing **`io.translaas:*`** artifacts from [translaas-sd
 1. Create a [Sonatype Central](https://central.sonatype.com/) account and register namespace **`io.translaas`** (reverse-DNS for **`translaas.io`**).
    - Verify ownership of **`translaas.io`** (DNS TXT record on the domain) or link your GitHub org if Central accepts that path for the namespace.
    - The root POM **`organizationUrl`** is **`https://mantelabs.com`** (publisher company); Maven **`groupId`** / Java packages use **`io.translaas`** (product domain).
-2. Generate a **user token** for publishing (Central Portal → Account → Generate user token).
+2. Generate a **Central Portal user token** for publishing (Central Portal → Account → Generate user token). Legacy OSSRH tokens no longer work (they return **401**).
 3. Store the token as GitHub Environment secrets on **`translaas-sdk-java`**:
 
 | Secret | Purpose |
@@ -118,7 +118,7 @@ From **translaas-all**:
 
 | Symptom | Likely cause |
 |---------|----------------|
-| Deploy fails: unauthorized | Missing or wrong **`MAVEN_USERNAME`** / **`MAVEN_PASSWORD`** |
+| Deploy fails: unauthorized | Missing/wrong **`MAVEN_USERNAME`** / **`MAVEN_PASSWORD`**, or legacy OSSRH token instead of Central Portal token |
 | GPG sign failure | **`MAVEN_GPG_PRIVATE_KEY`** or passphrase incorrect |
 | Version rejected | POM still contains **`-SNAPSHOT`** |
 | Namespace not found | **`io.translaas`** not verified in Sonatype Central (verify **`translaas.io`**) |
