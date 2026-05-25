@@ -7,8 +7,8 @@ This is an open-source **Java** SDK for the **Translaas Translation Delivery API
 **Repository type**: Java SDK library  
 **Languages**: Java  
 **JDK**: **11+** (baseline; match `maven-compiler-plugin` / CI matrix)  
-**Coordinates**: `com.mantelabs` (reverse-DNS for [mantelabs.com](https://mantelabs.com))
-**Base package**: `io.mantelabs.translaas`  
+**Coordinates**: `io.translaas` (reverse-DNS for [translaas.io](https://translaas.io))
+**Base package**: `io.translaas`  
 **Build system**: **Maven** (prefer `./mvnw` when the wrapper is present)  
 **Tests**: **JUnit 5** (JUnit Jupiter), **Mockito** / **AssertJ** as configured in the parent POM  
 **API parity reference**: `.docs/sdk-features-checklist.md`
@@ -107,7 +107,7 @@ When `.github/workflows/ci.yml` runs: **PRs and pushes to `main`** use **Ubuntu 
 
 **When adding a new Java type:**
 
-- Place it under `src/main/java/io/mantelabs/translaas/...` (or the module’s agreed package root)
+- Place it under `src/main/java/io/translaas/...` (or the module’s agreed package root)
 - Add **JUnit 5** tests under the parallel test tree
 - Expose public API only from documented packages; keep helpers in `internal` or package-private types
 
@@ -132,7 +132,7 @@ translaas-sdk-java/
 ├── pom.xml                           # Parent POM
 ├── translaas-sdk-models/
 │   ├── pom.xml
-│   └── src/main/java/io/mantelabs/translaas/...
+│   └── src/main/java/io/translaas/...
 ├── translaas-sdk-client/
 │   ├── pom.xml
 │   ├── src/main/java/...

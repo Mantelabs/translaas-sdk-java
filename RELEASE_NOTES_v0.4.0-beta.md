@@ -6,16 +6,16 @@ First **Maven Central** beta for the Java SDK at **`0.4.0-beta`**. Aligns with t
 
 ## Artifacts published
 
-- **`com.mantelabs:translaas-sdk:0.4.0-beta`** — convenience aggregator (recommended)
-- **`com.mantelabs:translaas-sdk-client:0.4.0-beta`**
-- **`com.mantelabs:translaas-sdk-models:0.4.0-beta`**
-- **`com.mantelabs:translaas-sdk-caching:0.4.0-beta`**
-- **`com.mantelabs:translaas-sdk-caching-file:0.4.0-beta`**
-- **`com.mantelabs:translaas-sdk-spring-boot-starter:0.4.0-beta`**
-- **`com.mantelabs:translaas-sdk-thymeleaf-spring-boot-starter:0.4.0-beta`**
-- **`com.mantelabs:translaas-sdk-parent:0.4.0-beta`** — parent POM
+- **`io.translaas:translaas-sdk:0.4.0-beta`** — convenience aggregator (recommended)
+- **`io.translaas:translaas-sdk-client:0.4.0-beta`**
+- **`io.translaas:translaas-sdk-models:0.4.0-beta`**
+- **`io.translaas:translaas-sdk-caching:0.4.0-beta`**
+- **`io.translaas:translaas-sdk-caching-file:0.4.0-beta`**
+- **`io.translaas:translaas-sdk-spring-boot-starter:0.4.0-beta`**
+- **`io.translaas:translaas-sdk-thymeleaf-spring-boot-starter:0.4.0-beta`**
+- **`io.translaas:translaas-sdk-parent:0.4.0-beta`** — parent POM
 
-Search: [Maven Central — com.mantelabs](https://central.sonatype.com/search?q=g:com.mantelabs)
+Search: [Maven Central — io.translaas](https://central.sonatype.com/search?q=g:io.translaas)
 
 ## Install
 
@@ -23,7 +23,7 @@ Search: [Maven Central — com.mantelabs](https://central.sonatype.com/search?q=
 
 ```xml
 <dependency>
-  <groupId>com.mantelabs</groupId>
+  <groupId>io.translaas</groupId>
   <artifactId>translaas-sdk</artifactId>
   <version>0.4.0-beta</version>
 </dependency>
@@ -33,7 +33,7 @@ Search: [Maven Central — com.mantelabs](https://central.sonatype.com/search?q=
 
 ```kotlin
 dependencies {
-    implementation("com.mantelabs:translaas-sdk:0.4.0-beta")
+    implementation("io.translaas:translaas-sdk:0.4.0-beta")
 }
 ```
 

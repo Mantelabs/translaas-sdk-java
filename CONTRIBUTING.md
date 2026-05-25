@@ -23,9 +23,9 @@ Use the **Maven Wrapper** (`mvnw` / `mvnw.cmd`) so the build matches CI and you 
 
 ## Layout
 
-- **Parent POM** — `com.mantelabs:translaas-sdk-parent` at the repo root.
+- **Parent POM** — `io.translaas:translaas-sdk-parent` at the repo root.
 - **Modules** — `translaas-sdk-models`, `translaas-sdk-client`, `translaas-sdk-caching`, `translaas-sdk-caching-file`, and the convenience aggregate `translaas-sdk`.
-- **Base package** — `io.mantelabs.translaas` (with subpackages per module where it helps). The HTTP client and its options builder live under **`io.mantelabs.translaas.client`**; the **`translaas-sdk`** aggregator may add facade types under **`io.mantelabs.translaas`** (see root **README.md** package table). Prefer that split over duplicating `TranslaasClient` in the root package.
+- **Base package** — `io.translaas` (with subpackages per module where it helps). The HTTP client and its options builder live under **`io.translaas.client`**; the **`translaas-sdk`** aggregator may add facade types under **`io.translaas`** (see root **README.md** package table). Prefer that split over duplicating `TranslaasClient` in the root package.
 
 ## Tests and coverage
 

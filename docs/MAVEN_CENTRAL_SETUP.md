@@ -1,14 +1,14 @@
 # Maven Central setup and release guide
 
-Quick reference for publishing **`com.mantelabs:*`** artifacts from [translaas-sdk-java](https://github.com/acuencadev/translaas-sdk-java).
+Quick reference for publishing **`io.translaas:*`** artifacts from [translaas-sdk-java](https://github.com/acuencadev/translaas-sdk-java).
 
 ## Prerequisites
 
 ### 1. Sonatype Central (OSSRH)
 
-1. Create a [Sonatype Central](https://central.sonatype.com/) account and register namespace **`com.mantelabs`** (reverse-DNS for **`mantelabs.com`**).
-   - Verify ownership of **`mantelabs.com`** (DNS TXT record on the domain) or link your GitHub org if Central accepts that path for the namespace.
-   - The root POM **`organizationUrl`** is **`https://mantelabs.com`**; keep Central namespace metadata aligned with that domain.
+1. Create a [Sonatype Central](https://central.sonatype.com/) account and register namespace **`io.translaas`** (reverse-DNS for **`translaas.io`**).
+   - Verify ownership of **`translaas.io`** (DNS TXT record on the domain) or link your GitHub org if Central accepts that path for the namespace.
+   - The root POM **`organizationUrl`** is **`https://mantelabs.com`** (publisher company); Maven **`groupId`** / Java packages use **`io.translaas`** (product domain).
 2. Generate a **user token** for publishing (Central Portal → Account → Generate user token).
 3. Store the token as GitHub Environment secrets on **`translaas-sdk-java`**:
 
@@ -31,7 +31,7 @@ The root **`pom.xml`** provides:
 
 Local **`./mvnw verify`** does **not** sign or deploy. CI uses **`./mvnw deploy -Prelease -DskipTests`**.
 
-**Maven coordinates vs Java packages:** artifacts publish under **`com.mantelabs`** (reverse-DNS for **`mantelabs.com`**). Java source packages remain **`io.mantelabs.translaas.*`** in this release line.
+Published Maven coordinates and Java packages both use **`io.translaas`** (reverse-DNS for **`translaas.io`**), aligned with the **`@translaas/*`** npm scope.
 
 ---
 
@@ -41,7 +41,7 @@ Local **`./mvnw verify`** does **not** sign or deploy. CI uses **`./mvnw deploy 
 2. Confirm CI is green on **`main`**.
 3. Tag and publish the GitHub Release (see below).
 4. Monitor the **Release** workflow → **Publish to Maven Central** job.
-5. Verify artifacts on [Maven Central](https://central.sonatype.com/search?q=g:com.mantelabs).
+5. Verify artifacts on [Maven Central](https://central.sonatype.com/search?q=g:io.translaas).
 6. Open a follow-up PR bumping **`main`** to the next dev snapshot (e.g. **`0.4.1-beta-SNAPSHOT`**).
 
 ---
@@ -121,7 +121,7 @@ From **translaas-all**:
 | Deploy fails: unauthorized | Missing or wrong **`MAVEN_USERNAME`** / **`MAVEN_PASSWORD`** |
 | GPG sign failure | **`MAVEN_GPG_PRIVATE_KEY`** or passphrase incorrect |
 | Version rejected | POM still contains **`-SNAPSHOT`** |
-| Namespace not found | **`com.mantelabs`** not verified in Sonatype Central |
+| Namespace not found | **`io.translaas`** not verified in Sonatype Central (verify **`translaas.io`**) |
 | Staging not released | Check Nexus staging plugin logs; **`autoReleaseAfterClose`** should close and release automatically |
 
 See also [`.docs/sdk-release-runbook.md`](../../../.docs/sdk-release-runbook.md) in **translaas-all** for orchestrated multi-SDK releases.

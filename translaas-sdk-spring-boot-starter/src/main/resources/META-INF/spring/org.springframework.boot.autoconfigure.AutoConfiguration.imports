@@ -1,1 +1,1 @@
-io.mantelabs.translaas.spring.boot.autoconfigure.TranslaasAutoConfiguration
+io.translaas.spring.boot.autoconfigure.TranslaasAutoConfiguration
