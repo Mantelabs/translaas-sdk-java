@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-## [0.4.0-beta-SNAPSHOT] - 2026-05-22
+## [0.4.0-beta] - 2026-05-22
 
 Coordinated **beta** release aligning the Java SDK with the **Translaas SDK v1** HTTP surface, the .NET reference implementation, and JS/Python **0.3.0-beta** / **0.4.0-beta** SDK lines.
 

@@ -8,7 +8,7 @@ GitHub stars
 
 A strongly typed, modular Java SDK for consuming the **Translaas Translation Delivery API**. Use it to fetch translations in JVM applications with compile-time safety and familiar Java APIs.
 
-Published artifacts use the `**io.mantelabs`** group ID (reverse-DNS for [mantelabs.io](https://mantelabs.io)). Example `baseUrl` values below assume the hosted API at `**https://api.mantelabs.io**`; use whatever origin matches your deployment.
+Published artifacts use the **`io.translaas`** group ID (reverse-DNS for [translaas.io](https://translaas.io)). Example `baseUrl` values below assume the hosted API at **`https://api.translaas.io`**; use whatever origin matches your deployment.
 
 ## Features
 
@@ -32,7 +32,7 @@ Published artifacts use the `**io.mantelabs`** group ID (reverse-DNS for [mantel
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>io.translaas</groupId>
   <artifactId>translaas-sdk</artifactId>
   <version>x.y.z</version><!-- replace with the current version from Maven Central -->
 </dependency>
@@ -42,7 +42,7 @@ Published artifacts use the `**io.mantelabs`** group ID (reverse-DNS for [mantel
 
 ```kotlin
 dependencies {
-    implementation("io.mantelabs:translaas-sdk:x.y.z") // replace with the current version from Maven Central
+    implementation("io.translaas:translaas-sdk:x.y.z") // replace with the current version from Maven Central
 }
 ```
 
@@ -50,7 +50,7 @@ dependencies {
 
 ```groovy
 dependencies {
-    implementation 'io.mantelabs:translaas-sdk:+'
+    implementation 'io.translaas:translaas-sdk:+'
 }
 ```
 
@@ -64,7 +64,7 @@ If a BOM is published for aligned versions:
 <dependencyManagement>
   <dependencies>
     <dependency>
-      <groupId>io.mantelabs</groupId>
+      <groupId>io.translaas</groupId>
       <artifactId>translaas-sdk-bom</artifactId>
       <version>x.y.z</version>
       <type>pom</type>
@@ -86,24 +86,24 @@ The **`translaas-sdk`** artifact exposes two layers, similar to .NET’s `Transl
 
 | Layer | Java package | Typical types |
 | ----- | ------------ | ------------- |
-| HTTP client | `io.mantelabs.translaas.client` | `TranslaasClient`, `TranslaasOptions` (client builder) |
-| Convenience API | `io.mantelabs.translaas` | `TranslaasService`, `TranslaasOptions` (facade builder), `CacheMode`, `LanguageCodes` |
+| HTTP client | `io.translaas.client` | `TranslaasClient`, `TranslaasOptions` (client builder) |
+| Convenience API | `io.translaas` | `TranslaasService`, `TranslaasOptions` (facade builder), `CacheMode`, `LanguageCodes` |
 
-Use **`io.mantelabs.translaas.client.TranslaasOptions`** when constructing **`TranslaasClient`**. Use the facade **`io.mantelabs.translaas.TranslaasOptions`** with **`TranslaasService`** (it delegates to the client options internally).
+Use **`io.translaas.client.TranslaasOptions`** when constructing **`TranslaasClient`**. Use the facade **`io.translaas.TranslaasOptions`** with **`TranslaasService`** (it delegates to the client options internally).
 
 ### 3. Create a client
 
 **Option A — `TranslaasService` (convenience lookups)**
 
 ```java
-import io.mantelabs.translaas.CacheMode;
-import io.mantelabs.translaas.LanguageCodes;
-import io.mantelabs.translaas.TranslaasOptions;
-import io.mantelabs.translaas.TranslaasService;
+import io.translaas.CacheMode;
+import io.translaas.LanguageCodes;
+import io.translaas.TranslaasOptions;
+import io.translaas.TranslaasService;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.translaas.io")
     .cacheMode(CacheMode.GROUP)
     .build();
 
@@ -126,13 +126,13 @@ The convenience and client APIs are **async-first**: they return **`CompletableF
 **Option B — `TranslaasClient` (full HTTP API)**
 
 ```java
-import io.mantelabs.translaas.LanguageCodes;
-import io.mantelabs.translaas.client.TranslaasClient;
-import io.mantelabs.translaas.client.TranslaasOptions;
+import io.translaas.LanguageCodes;
+import io.translaas.client.TranslaasClient;
+import io.translaas.client.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.translaas.io")
     .build();
 
 TranslaasClient client = new TranslaasClient(options);
@@ -144,16 +144,16 @@ Same **`CompletableFuture`** model as **`TranslaasService`**; use **`join()`** o
 
 ## Configuration
 
-Samples below use the **`io.mantelabs.translaas`** facade for **`TranslaasService`**. For **`TranslaasClient`** only, build **`io.mantelabs.translaas.client.TranslaasOptions`** instead.
+Samples below use the **`io.translaas`** facade for **`TranslaasService`**. For **`TranslaasClient`** only, build **`io.translaas.client.TranslaasOptions`** instead.
 
 ### Basic configuration
 
 ```java
-import io.mantelabs.translaas.TranslaasOptions;
+import io.translaas.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.translaas.io")
     .build();
 
 TranslaasService translaas = new TranslaasService(options);
@@ -162,14 +162,14 @@ TranslaasService translaas = new TranslaasService(options);
 ### Advanced configuration
 
 ```java
-import io.mantelabs.translaas.CacheMode;
-import io.mantelabs.translaas.LanguageCodes;
-import io.mantelabs.translaas.TranslaasOptions;
+import io.translaas.CacheMode;
+import io.translaas.LanguageCodes;
+import io.translaas.TranslaasOptions;
 import java.time.Duration;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.translaas.io")
     .defaultLanguage(LanguageCodes.ENGLISH)
     .cacheMode(CacheMode.GROUP)
     .cacheAbsoluteExpiration(Duration.ofHours(1))
@@ -199,11 +199,11 @@ Exact types (`Duration`, enums, builders) follow the published Javadoc.
 Use a disk-backed `FileCacheProvider` for offline-friendly persistence, or `HybridCacheProvider` for L1 memory plus L2 file with promotion on L2 hits:
 
 ```java
-import io.mantelabs.translaas.caching.MemoryTranslaasCacheOptions;
-import io.mantelabs.translaas.caching.TranslaasCacheEntry;
-import io.mantelabs.translaas.caching.file.FileCacheProvider;
-import io.mantelabs.translaas.caching.file.HybridCacheProvider;
-import io.mantelabs.translaas.caching.file.HybridCacheOptions;
+import io.translaas.caching.MemoryTranslaasCacheOptions;
+import io.translaas.caching.TranslaasCacheEntry;
+import io.translaas.caching.file.FileCacheProvider;
+import io.translaas.caching.file.HybridCacheProvider;
+import io.translaas.caching.file.HybridCacheOptions;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
@@ -227,12 +227,12 @@ hybrid.put("opaque-cache-key", sample);
 For cache-only or offline bootstrap, you can mark options so application code may skip API-key validation (the client does not validate on construction):
 
 ```java
-import io.mantelabs.translaas.client.TranslaasOptions;
+import io.translaas.client.TranslaasOptions;
 
 TranslaasOptions offlineAware =
     TranslaasOptions.builder()
         .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-        .baseUrl("https://api.mantelabs.io")
+        .baseUrl("https://api.translaas.io")
         .skipApiValidation(true)
         .build();
 ```
@@ -244,18 +244,18 @@ Typical mappings (names may match other Translaas SDKs):
 ```bash
 # Shell / container
 export TRANSLAAS_API_KEY=your-api-key
-export TRANSLAAS_BASE_URL=https://api.mantelabs.io
+export TRANSLAAS_BASE_URL=https://api.translaas.io
 export TRANSLAAS_CACHE_MODE=GROUP
 export TRANSLAAS_DEFAULT_LANGUAGE=en
 ```
 
 ```java
-import io.mantelabs.translaas.CacheMode;
-import io.mantelabs.translaas.TranslaasOptions;
+import io.translaas.CacheMode;
+import io.translaas.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl(System.getenv().getOrDefault("TRANSLAAS_BASE_URL", "https://api.mantelabs.io"))
+    .baseUrl(System.getenv().getOrDefault("TRANSLAAS_BASE_URL", "https://api.translaas.io"))
     .cacheMode(CacheMode.valueOf(System.getenv().getOrDefault("TRANSLAAS_CACHE_MODE", "NONE")))
     .defaultLanguage(System.getenv("TRANSLAAS_DEFAULT_LANGUAGE"))
     .build();
@@ -275,9 +275,9 @@ Add **`translaas-sdk-spring-boot-starter`** alongside **`spring-boot-starter`** 
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>io.translaas</groupId>
   <artifactId>translaas-sdk-spring-boot-starter</artifactId>
-  <version>x.y.z</version><!-- align with other io.mantelabs artifacts -->
+  <version>x.y.z</version><!-- align with other io.translaas artifacts -->
 </dependency>
 ```
 
@@ -286,7 +286,7 @@ Add **`translaas-sdk-spring-boot-starter`** alongside **`spring-boot-starter`** 
 ```yaml
 translaas:
   api-key: ${TRANSLAAS_API_KEY}
-  base-url: https://api.mantelabs.io
+  base-url: https://api.translaas.io
 ```
 
 Required keys match programmatic **`TranslaasOptions`**: `api-key` and `base-url`. Other settings use the same names as in the **Configuration options** table under [Configuration](#configuration) (kebab-case in YAML), for example `cache-mode`, `default-language`, `timeout`, `channel`, `skip-api-validation`.
@@ -299,7 +299,7 @@ Required keys match programmatic **`TranslaasOptions`**: `api-key` and `base-url
 | `translaas.caching.memory.enabled` | Registers a **`MemoryTranslaasCacheProvider`** bean (if you did not define your own **`TranslaasCacheProvider`**), with optional `translaas.caching.memory.lru-max-entries`. |
 | `translaas.locale.use-spring-locale-context` | Registers a **`LanguageResolver`** that uses Spring’s **`LocaleContextHolder`** (request locale in Spring MVC). |
 
-Disable or replace beans by defining your own **`TranslaasClient`**, **`TranslaasService`**, or **`io.mantelabs.translaas.TranslaasOptions`** bean where needed.
+Disable or replace beans by defining your own **`TranslaasClient`**, **`TranslaasService`**, or **`io.translaas.TranslaasOptions`** bean where needed.
 
 ### Spring Boot + Thymeleaf (optional starter)
 
@@ -309,7 +309,7 @@ Add **`translaas-sdk-thymeleaf-spring-boot-starter`** alongside **`translaas-sdk
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>io.translaas</groupId>
   <artifactId>translaas-sdk-thymeleaf-spring-boot-starter</artifactId>
   <version>x.y.z</version>
 </dependency>
@@ -320,7 +320,7 @@ Add **`translaas-sdk-thymeleaf-spring-boot-starter`** alongside **`translaas-sdk
 ```html
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:translaas="https://translaas.mantelabs.io">
+      xmlns:translaas="https://translaas.io">
 <body>
   <p><translaas:text group="common" entry="welcome"/></p>
   <p><translaas:text group="common" entry="hello" lang="fr" number="3" params='{"name":"Ada"}'/></p>
@@ -374,17 +374,17 @@ var withPlural = client.getEntry("messages", "item.count", LanguageCodes.ENGLISH
 ## Error handling
 
 ```java
-import io.mantelabs.translaas.LanguageCodes;
-import io.mantelabs.translaas.client.TranslaasClient;
-import io.mantelabs.translaas.client.TranslaasOptions;
-import io.mantelabs.translaas.models.exception.TranslaasApiException;
+import io.translaas.LanguageCodes;
+import io.translaas.client.TranslaasClient;
+import io.translaas.client.TranslaasOptions;
+import io.translaas.models.exception.TranslaasApiException;
 
-// Example: client constructed from io.mantelabs.translaas.client.TranslaasOptions
+// Example: client constructed from io.translaas.client.TranslaasOptions
 TranslaasClient client =
     new TranslaasClient(
         TranslaasOptions.builder()
             .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-            .baseUrl("https://api.mantelabs.io")
+            .baseUrl("https://api.translaas.io")
             .build());
 
 try {
@@ -406,7 +406,7 @@ Prefer typed exceptions from the SDK; map HTTP status codes and I/O failures as 
 ### Build from source
 
 ```bash
-git clone https://github.com/Mantelabs/translaas-sdk-java.git
+git clone https://github.io/translaas-sdk-java.git
 cd translaas-sdk-java
 ./mvnw -q verify
 ```
@@ -428,7 +428,7 @@ The repository is **Maven-first**: use the committed wrapper (`mvnw` / `mvnw.cmd
 
 ## API endpoints
 
-The SDK talks to the Translaas HTTP API. `baseUrl` must be the origin only (for example `https://api.mantelabs.io`).
+The SDK talks to the Translaas HTTP API. `baseUrl` must be the origin only (for example `https://api.translaas.io`).
 
 
 | Endpoint                              | Method | Purpose                                     |
@@ -449,11 +449,11 @@ Translation routes use GET with query parameters except `report-missing` (JSON b
 Send the API key using the `X-Api-Key` header (as defined in the OpenAPI spec). Configure it when building options (client or facade), for example:
 
 ```java
-import io.mantelabs.translaas.TranslaasOptions;
+import io.translaas.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.translaas.io")
     .build();
 ```
 
@@ -474,9 +474,9 @@ This project is licensed under the MIT License — see the [LICENSE](LICENSE) fi
 
 ## Support
 
-- **Website**: [https://mantelabs.io](https://mantelabs.io)
-- **Issues**: [https://github.com/Mantelabs/translaas-sdk-java/issues](https://github.com/Mantelabs/translaas-sdk-java/issues)
-- **Documentation**: published on [mantelabs.io](https://mantelabs.io) when available
+- **Website**: [https://translaas.io](https://translaas.io) (product) · [https://mantelabs.com](https://mantelabs.com) (company)
+- **Issues**: [https://github.com/acuencadev/translaas-sdk-java/issues](https://github.com/acuencadev/translaas-sdk-java/issues)
+- **Documentation**: published on [translaas.io](https://translaas.io) when available
 
 ## Contributing
 

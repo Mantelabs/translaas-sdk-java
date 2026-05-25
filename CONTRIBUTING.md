@@ -23,9 +23,9 @@ Use the **Maven Wrapper** (`mvnw` / `mvnw.cmd`) so the build matches CI and you 
 
 ## Layout
 
-- **Parent POM** — `io.mantelabs:translaas-sdk-parent` at the repo root.
+- **Parent POM** — `io.translaas:translaas-sdk-parent` at the repo root.
 - **Modules** — `translaas-sdk-models`, `translaas-sdk-client`, `translaas-sdk-caching`, `translaas-sdk-caching-file`, and the convenience aggregate `translaas-sdk`.
-- **Base package** — `io.mantelabs.translaas` (with subpackages per module where it helps). The HTTP client and its options builder live under **`io.mantelabs.translaas.client`**; the **`translaas-sdk`** aggregator may add facade types under **`io.mantelabs.translaas`** (see root **README.md** package table). Prefer that split over duplicating `TranslaasClient` in the root package.
+- **Base package** — `io.translaas` (with subpackages per module where it helps). The HTTP client and its options builder live under **`io.translaas.client`**; the **`translaas-sdk`** aggregator may add facade types under **`io.translaas`** (see root **README.md** package table). Prefer that split over duplicating `TranslaasClient` in the root package.
 
 ## Tests and coverage
 
@@ -40,6 +40,7 @@ Use the **Maven Wrapper** (`mvnw` / `mvnw.cmd`) so the build matches CI and you 
   On PowerShell, set `$env:TRANSLAAS_BASE_URL` and `$env:TRANSLAAS_API_KEY` instead of `export`.
   If those variables are unset, the live test class is skipped and the build still succeeds. In **GitHub Actions**, use repository secrets with the same names and run the **Integration tests** workflow manually (`.github/workflows/integration-tests.yml`).
 - User-facing release notes for maintainers: see **`CHANGELOG.md`** and [`.github/RELEASE_NOTES_TEMPLATE.md`](.github/RELEASE_NOTES_TEMPLATE.md).
+- Maven Central setup and publish steps: **[`docs/MAVEN_CENTRAL_SETUP.md`](docs/MAVEN_CENTRAL_SETUP.md)**.
 
 ## Pull requests
 

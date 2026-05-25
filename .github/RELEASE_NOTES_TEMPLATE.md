@@ -16,11 +16,11 @@ Summarize this release in a few sentences: scope (e.g. beta / GA), alignment wit
 
 ## 📦 Artifacts published
 
-- **`io.mantelabs:translaas-sdk:VERSION`** — [Maven Central](https://central.sonatype.com/search?q=g:io.mantelabs+translaas-sdk)
+- **`io.translaas:translaas-sdk:VERSION`** — [Maven Central](https://central.sonatype.com/search?q=g:io.translaas+translaas-sdk)
 
 <!-- Optional: additional modules or BOM -->
 
-- **`io.mantelabs:translaas-sdk-bom:VERSION`** (if applicable)
+- **`io.translaas:translaas-sdk-bom:VERSION`** (if applicable)
 
 ## 📥 Install
 
@@ -28,7 +28,7 @@ Summarize this release in a few sentences: scope (e.g. beta / GA), alignment wit
 
 ```xml
 <dependency>
-  <groupId>io.mantelabs</groupId>
+  <groupId>io.translaas</groupId>
   <artifactId>translaas-sdk</artifactId>
   <version>VERSION</version>
 </dependency>
@@ -38,7 +38,7 @@ Summarize this release in a few sentences: scope (e.g. beta / GA), alignment wit
 
 ```kotlin
 dependencies {
-    implementation("io.mantelabs:translaas-sdk:VERSION")
+    implementation("io.translaas:translaas-sdk:VERSION")
 }
 ```
 
@@ -47,15 +47,15 @@ dependencies {
 ### 1. Short section title
 
 - Bullet points for public API / behavior.
-- Reference packages: `io.mantelabs.translaas.client`, `io.mantelabs.translaas.config`, etc.
+- Reference packages: `io.translaas.client`, `io.translaas.config`, etc.
 
 ```java
-import io.mantelabs.translaas.client.TranslaasClient;
-import io.mantelabs.translaas.client.TranslaasOptions;
+import io.translaas.client.TranslaasClient;
+import io.translaas.client.TranslaasOptions;
 
 TranslaasOptions options = TranslaasOptions.builder()
     .apiKey(System.getenv("TRANSLAAS_API_KEY"))
-    .baseUrl("https://api.mantelabs.io")
+    .baseUrl("https://api.translaas.io")
     .build();
 
 TranslaasClient client = new TranslaasClient(options);
@@ -72,9 +72,9 @@ Describe test status for this line (e.g. JUnit 5, `./mvnw verify`, approximate t
 
 ## 📚 Documentation
 
-- **[README.md](https://github.com/Mantelabs/translaas-sdk-java/blob/main/README.md)**: install, `baseUrl`, API overview
-- **[`.docs/`](https://github.com/Mantelabs/translaas-sdk-java/tree/main/.docs)** or **`docs/`** (if present): deep dives
-- **[CONTRIBUTING.md](https://github.com/Mantelabs/translaas-sdk-java/blob/main/CONTRIBUTING.md)** (if present): release / Maven Central process
+- **[README.md](https://github.io/translaas-sdk-java/blob/main/README.md)**: install, `baseUrl`, API overview
+- **[`.docs/`](https://github.io/translaas-sdk-java/tree/main/.docs)** or **`docs/`** (if present): deep dives
+- **[CONTRIBUTING.md](https://github.io/translaas-sdk-java/blob/main/CONTRIBUTING.md)** (if present): release / Maven Central process
 
 ## 🔄 Migration guide
 
@@ -86,7 +86,7 @@ Summarize fixes; link **`CHANGELOG.md`** section for detail.
 
 ## 📝 Changelog
 
-- **[CHANGELOG.md](https://github.com/Mantelabs/translaas-sdk-java/blob/vVERSION/CHANGELOG.md)** — section for this release (use the same `vVERSION` git tag as the release)
+- **[CHANGELOG.md](https://github.io/translaas-sdk-java/blob/vVERSION/CHANGELOG.md)** — section for this release (use the same `vVERSION` git tag as the release)
 
 ## 🙏 Contributors
 
@@ -94,8 +94,8 @@ Thank contributors by name or “Translaas SDK Contributors”.
 
 ---
 
-**Repository**: https://github.com/Mantelabs/translaas-sdk-java  
+**Repository**: https://github.io/translaas-sdk-java  
 
-**Full compare**: https://github.com/Mantelabs/translaas-sdk-java/compare/PREVIOUS_TAG...vVERSION  
+**Full compare**: https://github.io/translaas-sdk-java/compare/PREVIOUS_TAG...vVERSION  
 
 (Replace `PREVIOUS_TAG` and `VERSION` with the previous release tag and this release tag, e.g. `v0.2.0...v0.3.0`.)

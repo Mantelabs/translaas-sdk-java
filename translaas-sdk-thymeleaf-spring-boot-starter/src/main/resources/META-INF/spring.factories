@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.mantelabs.translaas.spring.boot.autoconfigure.TranslaasThymeleafAutoConfiguration
+io.translaas.spring.boot.autoconfigure.TranslaasThymeleafAutoConfiguration

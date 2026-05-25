@@ -1,6 +1,6 @@
 # Java SDK v1 parity checklist
 
-Sign-off for **0.3.0-beta-SNAPSHOT** parity with the Translaas SDK HTTP API, .NET reference, and JS/Python **0.3.0-beta** SDKs.
+Sign-off for **0.4.0-beta** parity with the Translaas SDK HTTP API, .NET reference, and JS/Python **0.3.0-beta** / **0.4.0-beta** SDKs.
 
 Reference: [translaas-sdk-java-parity-change-plan.md](../../../.docs/translaas-sdk-java-parity-change-plan.md)
 
@@ -47,4 +47,4 @@ Reference: [translaas-sdk-java-parity-change-plan.md](../../../.docs/translaas-s
 
 | Role | Version | Date |
 |------|---------|------|
-| Implementation | 0.3.0-beta-SNAPSHOT | 2026-05-21 |
+| Implementation | 0.4.0-beta | 2026-05-22 |

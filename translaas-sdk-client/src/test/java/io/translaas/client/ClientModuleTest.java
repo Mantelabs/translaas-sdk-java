@@ -1,0 +1,20 @@
+package io.translaas.client;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import io.translaas.client.http.TranslaasHttp;
+import org.junit.jupiter.api.Test;
+
+class ClientModuleTest {
+
+  @Test
+  void translaasOptions_andHttpType_load() {
+    TranslaasOptions options =
+        TranslaasOptions.builder()
+            .apiKey("k")
+            .baseUrl(TestApiUrls.ORIGIN)
+            .build();
+    assertThat(options.getBaseUrl().getHost()).isEqualTo(TestApiUrls.HOST);
+    assertThat(new TranslaasHttp(options)).isNotNull();
+  }
+}
