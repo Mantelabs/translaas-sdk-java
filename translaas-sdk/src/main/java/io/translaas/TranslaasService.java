@@ -87,6 +87,29 @@ public final class TranslaasService {
     return getEntry(group, entry, resolveLanguage(), null, null, null, null);
   }
 
+  public CompletableFuture<String> t(String group, String entry, long pluralN) {
+    return getEntry(group, entry, resolveLanguage(), BigDecimal.valueOf(pluralN), null, null, null);
+  }
+
+  public CompletableFuture<String> t(String group, String entry, BigDecimal pluralN) {
+    return getEntry(group, entry, resolveLanguage(), pluralN, null, null, null);
+  }
+
+  public CompletableFuture<String> t(String group, String entry, Map<String, String> parameters) {
+    return getEntry(group, entry, resolveLanguage(), null, parameters, null, null);
+  }
+
+  public CompletableFuture<String> t(
+      String group, String entry, long pluralN, Map<String, String> parameters) {
+    return getEntry(
+        group, entry, resolveLanguage(), BigDecimal.valueOf(pluralN), parameters, null, null);
+  }
+
+  public CompletableFuture<String> t(
+      String group, String entry, BigDecimal pluralN, Map<String, String> parameters) {
+    return getEntry(group, entry, resolveLanguage(), pluralN, parameters, null, null);
+  }
+
   public CompletableFuture<String> t(String group, String entry, String lang, long pluralN) {
     return getEntry(group, entry, lang, BigDecimal.valueOf(pluralN), null, null, null);
   }
