@@ -12,6 +12,7 @@ public final class TranslaasLanguageResolver implements LanguageResolver {
 
   @Override
   public Optional<String> resolveLanguage() {
-    return Optional.of(LocaleContextHolder.getLocale().toLanguageTag());
+    String language = LocaleContextHolder.getLocale().getLanguage();
+    return language.isBlank() ? Optional.empty() : Optional.of(language);
   }
 }
