@@ -2,11 +2,21 @@ package io.translaas.i18n;
 
 import java.math.BigDecimal;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/** Replaces {@code {{name}}}, {@code {name}}, and {@code %name%} placeholders. */
+/**
+ * Replaces {@code {name}} placeholders in offline cache templates.
+ *
+ * <p>Matches .NET {@code CachingTranslaasClient.SubstituteParameters}: {@code {name}} only,
+ * case-insensitive parameter keys, and auto-{@code N} from {@code number} unless an explicit {@code
+ * N} is already provided.
+ */
 public final class ParameterReplacer {
+
+  private static final Pattern PLACEHOLDER = Pattern.compile("\\{([a-zA-Z0-9_]+)\\}");
 
   private ParameterReplacer() {}
 
@@ -16,22 +26,15 @@ public final class ParameterReplacer {
     if (merged.isEmpty()) {
       return text;
     }
-    String result = text;
-    for (Map.Entry<String, String> e : merged.entrySet()) {
-      String key = Pattern.quote(e.getKey());
-      String value = e.getValue();
-      result = result.replaceAll("\\{\\{" + key + "\\}\\}", value);
+    Matcher matcher = PLACEHOLDER.matcher(text);
+    StringBuffer buffer = new StringBuffer();
+    while (matcher.find()) {
+      String placeholderName = matcher.group(1);
+      String value = lookup(merged, placeholderName);
+      matcher.appendReplacement(buffer, Matcher.quoteReplacement(value != null ? value : matcher.group(0)));
     }
-    for (Map.Entry<String, String> e : merged.entrySet()) {
-      String key = Pattern.quote(e.getKey());
-      String value = e.getValue();
-      result = result.replaceAll("(?<!\\{)\\{" + key + "\\}(?!\\})", value);
-    }
-    for (Map.Entry<String, String> e : merged.entrySet()) {
-      String key = Pattern.quote(e.getKey());
-      result = result.replaceAll("%" + key + "%", e.getValue());
-    }
-    return result;
+    matcher.appendTail(buffer);
+    return buffer.toString();
   }
 
   private static Map<String, String> mergeNumber(
@@ -45,9 +48,22 @@ public final class ParameterReplacer {
             }
           });
     }
-    if (number != null && !merged.containsKey("N") && !merged.containsKey("n")) {
+    if (number != null && lookup(merged, "N") == null) {
       merged.put("N", number.toPlainString());
     }
     return merged;
+  }
+
+  private static String lookup(Map<String, String> parameters, String name) {
+    if (parameters.containsKey(name)) {
+      return parameters.get(name);
+    }
+    String lowered = name.toLowerCase(Locale.ROOT);
+    for (Map.Entry<String, String> entry : parameters.entrySet()) {
+      if (entry.getKey() != null && entry.getKey().toLowerCase(Locale.ROOT).equals(lowered)) {
+        return entry.getValue();
+      }
+    }
+    return null;
   }
 }
