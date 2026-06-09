@@ -132,6 +132,57 @@ class TranslaasServiceTest {
   }
 
   @Test
+  void t_withAutoLangPlural_delegatesWithResolvedLanguage() {
+    when(client.getEntry(
+            eq("messages"),
+            eq("item"),
+            eq("en"),
+            ArgumentMatchers.eq(BigDecimal.valueOf(5)),
+            isNull(),
+            isNull(),
+            isNull()))
+        .thenReturn(CompletableFuture.completedFuture("items"));
+
+    TranslaasService service = new TranslaasService(client, clientOptions, List.of());
+    assertThat(service.t("messages", "item", 5).join()).isEqualTo("items");
+  }
+
+  @Test
+  void t_withAutoLangParameters_delegatesWithResolvedLanguage() {
+    Map<String, String> params = Map.of("userName", "John");
+    when(client.getEntry(
+            eq("messages"),
+            eq("greeting"),
+            eq("en"),
+            isNull(),
+            eq(params),
+            isNull(),
+            isNull()))
+        .thenReturn(CompletableFuture.completedFuture("Hello John"));
+
+    TranslaasService service = new TranslaasService(client, clientOptions, List.of());
+    assertThat(service.t("messages", "greeting", params).join()).isEqualTo("Hello John");
+  }
+
+  @Test
+  void t_withAutoLangPluralAndParameters_delegatesWithResolvedLanguage() {
+    Map<String, String> params = Map.of("userName", "John", "pending", "3");
+    when(client.getEntry(
+            eq("messages"),
+            eq("greeting"),
+            eq("en"),
+            ArgumentMatchers.eq(BigDecimal.valueOf(5)),
+            eq(params),
+            isNull(),
+            isNull()))
+        .thenReturn(CompletableFuture.completedFuture("Hello John, you have 5 items and 3 pending"));
+
+    TranslaasService service = new TranslaasService(client, clientOptions, List.of());
+    assertThat(service.t("messages", "greeting", 5, params).join())
+        .isEqualTo("Hello John, you have 5 items and 3 pending");
+  }
+
+  @Test
   void t_plural_delegatesWithDecimalN() {
     when(client.getEntry(
             eq("messages"),
