@@ -2,6 +2,16 @@
 
 ## [Unreleased]
 
+### Changed
+
+- **`TranslaasService.t()`** — added auto-language overloads for plural count and parameters (parity with .NET `ITranslaasService.T`).
+- **`PluralResolver`** — offline cache plural selection uses one/other only (`1 → one`, else `other`; language ignored), matching .NET `CachingTranslaasClient.DeterminePluralCategory`.
+- **`ParameterReplacer`** — offline substitution uses `{name}` placeholders only with case-insensitive keys and auto-`N` merge, matching .NET `SubstituteParameters`.
+
+### Added
+
+- Tests for offline `{N}` / `{userName}` substitution and README .NET SDK parity section.
+
 ## [0.4.0-beta] - 2026-05-22
 
 Coordinated **beta** release aligning the Java SDK with the **Translaas SDK v1** HTTP surface, the .NET reference implementation, and JS/Python **0.3.0-beta** / **0.4.0-beta** SDK lines.

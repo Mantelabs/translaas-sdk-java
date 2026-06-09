@@ -117,6 +117,10 @@ var welcomeAuto = translaas.t("common", "welcome").join();
 
 // Pluralization (signature mirrors server / SDK contract)
 var items = translaas.t("messages", "item", LanguageCodes.ENGLISH, 5).join();
+
+// Auto language resolution with plural count or parameters (matches .NET ITranslaasService.T)
+var itemsAuto = translaas.t("messages", "item", 5).join();
+var greetingAuto = translaas.t("messages", "greeting", Map.of("userName", "John")).join();
 ```
 
 #### `CompletableFuture` and `join()`
@@ -341,6 +345,18 @@ Markup aligns with the .NET Razor **translaas** tag helper: **`group`**, **`entr
 ### Other JVM frameworks
 
 Without the starter, you can expose **`TranslaasClient`** / **`TranslaasService`** as **`@Bean`** methods from **`@Configuration`** (for example in Spring Boot), or use **CDI** producers on **Jakarta EE**, **Quarkus**, or **Micronaut**. **Android** is only appropriate if the SDK’s Android policy and dependencies match your app; prefer a dedicated Android artifact if one is published.
+
+### .NET SDK parity
+
+The Java SDK aligns with the [.NET Translaas.SDK](https://github.com/acuencadev/Translaas.SDK) as the cross-language contract:
+
+| Area | Online (`TranslaasClient` / `t()`) | Offline (`CachingTranslaasClient`) |
+| ---- | ----------------------------------- | ---------------------------------- |
+| Plural selection | Server resolves via `n` / `N` query params | One/other only (`1 → one`, else `other`; language ignored) |
+| Parameter substitution | Server resolves when using `TranslaasClient.getEntry()` | `{name}` placeholders only; case-insensitive keys; auto-`N` from `number` unless explicit `N` is provided |
+| `t()` overloads | Explicit language and auto-language variants including `number` and `parameters` | Same service API; offline cache path uses `PluralResolver` and `ParameterReplacer` in `io.translaas.i18n` |
+
+`TranslaasService.t()` delegates to the client for online lookups. Offline cache reads resolve plural forms and substitute parameters locally, matching .NET `CachingTranslaasClient`.
 
 ## Usage examples
 
