@@ -7,9 +7,12 @@
 - **`TranslaasService.t()`** — added auto-language overloads for plural count and parameters (parity with .NET `ITranslaasService.T`).
 - **`PluralResolver`** — offline cache plural selection uses one/other only (`1 → one`, else `other`; language ignored), matching .NET `CachingTranslaasClient.DeterminePluralCategory`.
 - **`ParameterReplacer`** — offline substitution uses `{name}` placeholders only with case-insensitive keys and auto-`N` merge, matching .NET `SubstituteParameters`.
+- **`TranslaasLanguageResolver`** — returns ISO-639 language codes via **`Locale#getLanguage()`** (for example `en` from `en_US`) instead of BCP 47 **`toLanguageTag()`**.
+- README **Examples** section links to **[translaas-sdk-examples](https://github.com/acuencadev/translaas-sdk-examples)**.
 
 ### Added
 
+- **`preferHttp11`** on client and facade **`TranslaasOptions`** — pins JDK **`HttpClient`** to HTTP/1.1 when enabled; Spring Boot maps **`translaas.prefer-http-11`**.
 - Tests for offline `{N}` / `{userName}` substitution and README .NET SDK parity section.
 
 ## [0.4.0-beta] - 2026-05-22

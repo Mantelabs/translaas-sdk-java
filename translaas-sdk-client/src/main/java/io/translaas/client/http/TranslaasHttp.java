@@ -46,12 +46,7 @@ public final class TranslaasHttp {
   }
 
   private static HttpClient newClient(TranslaasOptions options) {
-    HttpClient.Builder b = HttpClient.newBuilder();
-    Duration timeout = options.getTimeout();
-    if (timeout != null) {
-      b.connectTimeout(timeout);
-    }
-    return b.build();
+    return io.translaas.client.JdkHttpClientFactory.create(options);
   }
 
   /**

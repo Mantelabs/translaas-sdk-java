@@ -38,6 +38,7 @@ public class TranslaasProperties {
   private boolean skipApiValidation;
   private String apiKeyHeader;
   private String sdkTranslationsPathPrefix;
+  private boolean preferHttp11;
 
   private final Caching caching = new Caching();
   private final Offline offline = new Offline();
@@ -171,6 +172,14 @@ public class TranslaasProperties {
     this.sdkTranslationsPathPrefix = sdkTranslationsPathPrefix;
   }
 
+  public boolean isPreferHttp11() {
+    return preferHttp11;
+  }
+
+  public void setPreferHttp11(boolean preferHttp11) {
+    this.preferHttp11 = preferHttp11;
+  }
+
   public Caching getCaching() {
     return caching;
   }
@@ -220,6 +229,7 @@ public class TranslaasProperties {
     }
     b.useConditionalRequests(useConditionalRequests);
     b.skipApiValidation(skipApiValidation);
+    b.preferHttp11(preferHttp11);
     if (apiKeyHeader != null && !apiKeyHeader.isBlank()) {
       b.apiKeyHeader(apiKeyHeader);
     }

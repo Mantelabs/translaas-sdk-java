@@ -36,6 +36,7 @@ public final class TranslaasOptions {
   private final String sdkTranslationsPathPrefix;
   private final TranslaasCacheProvider cacheProvider;
   private final OfflineCacheOptions offlineCache;
+  private final boolean preferHttp11;
 
   public String getApiKey() {
     return apiKey;
@@ -126,6 +127,14 @@ public final class TranslaasOptions {
     return offlineCache;
   }
 
+  /**
+   * When {@code true}, the JDK {@link java.net.http.HttpClient} uses HTTP/1.1 only (skips HTTP/2
+   * ALPN). Useful when a reverse proxy or dev gateway mishandles HTTP/2 over TLS.
+   */
+  public boolean isPreferHttp11() {
+    return preferHttp11;
+  }
+
   public static Builder builder() {
     return new Builder();
   }
@@ -150,6 +159,7 @@ public final class TranslaasOptions {
     private String sdkTranslationsPathPrefix = SdkTranslationPaths.DEFAULT_PREFIX;
     private TranslaasCacheProvider cacheProvider;
     private OfflineCacheOptions offlineCache;
+    private boolean preferHttp11;
 
     private Builder() {}
 
@@ -251,6 +261,11 @@ public final class TranslaasOptions {
       return this;
     }
 
+    public Builder preferHttp11(boolean preferHttp11) {
+      this.preferHttp11 = preferHttp11;
+      return this;
+    }
+
     public TranslaasOptions build() {
       if (apiKey == null || apiKey.isBlank()) {
         throw new TranslaasConfigurationException("apiKey is required");
@@ -282,5 +297,6 @@ public final class TranslaasOptions {
         SdkTranslationPaths.normalizePrefix(builder.sdkTranslationsPathPrefix);
     this.cacheProvider = builder.cacheProvider;
     this.offlineCache = builder.offlineCache;
+    this.preferHttp11 = builder.preferHttp11;
   }
 }

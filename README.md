@@ -194,6 +194,7 @@ TranslaasOptions options = TranslaasOptions.builder()
 | `cacheAbsoluteExpiration` | No       | Absolute cache TTL                                        |
 | `cacheSlidingExpiration`  | No       | Sliding cache TTL                                         |
 | `timeout`                 | No       | HTTP client timeout                                       |
+| `preferHttp11`            | No       | Pin JDK `HttpClient` to HTTP/1.1 (default `false`)        |
 
 
 Exact types (`Duration`, enums, builders) follow the published Javadoc.
@@ -301,7 +302,8 @@ Required keys match programmatic **`TranslaasOptions`**: `api-key` and `base-url
 | -------- | ------ |
 | `translaas.enabled` | When `false`, skips auto-configuration (default `true`). |
 | `translaas.caching.memory.enabled` | Registers a **`MemoryTranslaasCacheProvider`** bean (if you did not define your own **`TranslaasCacheProvider`**), with optional `translaas.caching.memory.lru-max-entries`. |
-| `translaas.locale.use-spring-locale-context` | Registers a **`LanguageResolver`** that uses Spring’s **`LocaleContextHolder`** (request locale in Spring MVC). |
+| `translaas.locale.use-spring-locale-context` | Registers a **`LanguageResolver`** that uses Spring’s **`LocaleContextHolder`** (request locale in Spring MVC). Resolves the ISO-639 language code (for example `en` from `en_US`), not a full BCP 47 tag. |
+| `translaas.prefer-http-11` | When `true`, pins the JDK **`HttpClient`** to HTTP/1.1 (skips HTTP/2 ALPN). Useful behind reverse proxies or dev gateways that mishandle HTTP/2 over TLS. |
 
 Disable or replace beans by defining your own **`TranslaasClient`**, **`TranslaasService`**, or **`io.translaas.TranslaasOptions`** bean where needed.
 
@@ -475,14 +477,9 @@ TranslaasOptions options = TranslaasOptions.builder()
 
 ## Examples
 
-Sample projects may live under `examples/` (not always tracked). If present:
+Standalone sample applications (Spring Boot, console, and similar) live in **[translaas-sdk-examples](https://github.com/acuencadev/translaas-sdk-examples)**.
 
-```bash
-cd examples/basic
-./mvnw exec:java -Dexec.mainClass="com.example.Main"
-```
-
-Adjust module layout and commands to match the repository once examples are added.
+For minimal usage inside your own project, see **Quick Start** and **Configuration** above. The optional Spring Boot starter is documented under [Framework integration](#framework-integration).
 
 ## License
 

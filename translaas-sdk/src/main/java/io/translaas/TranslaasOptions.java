@@ -130,6 +130,11 @@ public final class TranslaasOptions {
       return this;
     }
 
+    public Builder preferHttp11(boolean preferHttp11) {
+      inner.preferHttp11(preferHttp11);
+      return this;
+    }
+
     public TranslaasOptions build() {
       return new TranslaasOptions(inner.build());
     }
