@@ -6,7 +6,7 @@
 
   <groupId>io.translaas</groupId>
   <artifactId>translaas-sdk-parent</artifactId>
-  <version>0.4.0-beta</version>
+  <version>0.5.0-beta</version>
   <packaging>pom</packaging>
 
   <name>Translaas SDK Parent</name>
