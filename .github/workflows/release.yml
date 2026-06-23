@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Server id must match <distributionManagement><repository><id> in the root POM (often ossrh).
       # Repository secrets: MAVEN_USERNAME, MAVEN_PASSWORD (OSSRH / Central token user),
