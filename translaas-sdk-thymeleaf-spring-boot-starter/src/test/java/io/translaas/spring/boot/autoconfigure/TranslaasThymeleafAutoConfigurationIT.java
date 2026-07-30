@@ -14,17 +14,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.thymeleaf.context.Context;
-import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 @SpringBootTest(classes = TranslaasThymeleafAutoConfigurationIT.MinimalApp.class)
 class TranslaasThymeleafAutoConfigurationIT {
 
   @Autowired private SpringTemplateEngine templateEngine;
 
-  @MockBean private TranslaasService translaasService;
+  @MockitoBean private TranslaasService translaasService;
 
   @Test
   void autoConfiguredEngine_rendersTranslaasTextTag() {
