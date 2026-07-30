@@ -39,12 +39,24 @@ jobs:
           set -euo pipefail
           if [[ -f ./mvnw ]]; then
             chmod +x ./mvnw
-            ./mvnw -B -ntp verify
+            MVN=./mvnw
           elif command -v mvn >/dev/null 2>&1; then
-            mvn -B -ntp verify
+            MVN=mvn
           else
             echo "Add the Maven Wrapper to the repo (mvn -N wrapper:wrapper) or install Maven on the runner."
             exit 1
+          fi
+
+          if [[ "${{ matrix.java-version }}" == "11" ]]; then
+            # JUnit 6 and Spring Boot 4 require JDK 17+ for tests/starters. JDK 11 still verifies
+            # core modules compile to the Java 11 bytecode target.
+            EXTRA=(-Dmaven.test.skip=true)
+            if grep -q '<spring-boot.version>4' translaas-sdk-spring-boot-starter/pom.xml; then
+              EXTRA+=(-pl '!translaas-sdk-spring-boot-starter,!translaas-sdk-thymeleaf-spring-boot-starter')
+            fi
+            "$MVN" -B -ntp verify "${EXTRA[@]}"
+          else
+            "$MVN" -B -ntp verify
           fi
 
       - name: Upload JaCoCo reports (if present)
