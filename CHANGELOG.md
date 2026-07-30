@@ -2,6 +2,19 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-07-30
+
+### Added
+
+- **`ApiKeyProjectResolver`** — resolves the effective default project from validate API key responses when callers omit `defaultProjectId` (multi-project API keys).
+- Spring Boot **4.1** support in optional starters (Thymeleaf integration updated for Boot 4 module layout and `@MockitoBean`).
+
+### Changed
+
+- Test toolchain: JUnit **6.1.1**, Mockito **5.23.0**, AssertJ **3.27.7**.
+- CI: JDK 11 jobs compile core modules only; full tests run on JDK 17 and 21.
+- Dependency bumps: Jackson **2.22.1**, JaCoCo **0.8.15**, Maven plugins, and GitHub Actions.
+
 ## [0.5.0-beta] - 2026-06-09
 
 Coordinated **beta** release aligning offline cache behavior and **`TranslaasService.t()`** overloads with the .NET reference implementation and JS/Python **0.5.0** SDK lines.
