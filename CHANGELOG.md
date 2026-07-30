@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [0.5.0-beta] - 2026-06-09
+
+Coordinated **beta** release aligning offline cache behavior and **`TranslaasService.t()`** overloads with the .NET reference implementation and JS/Python **0.5.0** SDK lines.
+
 ### Changed
 
 - **`TranslaasService.t()`** — added auto-language overloads for plural count and parameters (parity with .NET `ITranslaasService.T`).
