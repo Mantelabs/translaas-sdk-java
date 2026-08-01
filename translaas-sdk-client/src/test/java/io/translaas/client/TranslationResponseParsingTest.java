@@ -34,6 +34,30 @@ class TranslationResponseParsingTest {
   }
 
   @Test
+  void parseProjectResponse_excludesRootMetadataFromFlatCompositeGroups() throws Exception {
+    String json =
+        "{"
+            + "\"project\":\"translaas-sdk-samples\","
+            + "\"lang\":\"en\","
+            + "\"version\":245734752,"
+            + "\"generatedAt\":\"2026-01-15T12:00:00Z\","
+            + "\"groupEntryContext\":{\"common\":{\"welcome.message\":{\"note\":\"ctx\"}}},"
+            + "\"common.welcome.message\":\"Welcome\","
+            + "\"messages.item\":\"1 item\""
+            + "}";
+    ProjectTranslationsResponse r =
+        TranslationResponseParsing.parseProjectResponse(json, TranslaasClient.FORMAT_FLAT_JSON);
+
+    assertThat(r.getProject()).isEqualTo("translaas-sdk-samples");
+    assertThat(r.getLang()).isEqualTo("en");
+    assertThat(r.getVersion()).isEqualTo(245734752);
+    assertThat(r.getGroups()).containsKeys("common", "messages");
+    assertThat(r.getGroups()).doesNotContainKeys("project", "lang", "version", "generatedAt", "groupEntryContext");
+    assertThat(r.getGroups().get("common").getEntries().get("welcome.message").asText())
+        .isEqualTo("Welcome");
+  }
+
+  @Test
   void parseProjectResponse_envelopeWithEmptyEntries() throws Exception {
     String json =
         "{\"project\":\"demo\",\"lang\":\"en\",\"version\":0,"
