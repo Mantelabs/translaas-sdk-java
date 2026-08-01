@@ -437,6 +437,19 @@ The repository is **Maven-first**: use the committed wrapper (`mvnw` / `mvnw.cmd
 ./mvnw test
 ```
 
+### Live API integration tests (optional)
+
+Requires `TRANSLAAS_API_KEY`. Defaults: `TRANSLAAS_BASE_URL=https://api.translaas.local`, `TRANSLAAS_DEFAULT_PROJECT=translaas-sdk-samples`. Uses [translaas-sdk-examples](https://github.com/Mantelabs/translaas-sdk-examples) fixture data (`common` / `welcome.message`, `messages` / `item`).
+
+```bash
+export TRANSLAAS_API_KEY="your-api-key"
+./mvnw -Pintegration verify -pl translaas-sdk-client-integration-tests -am
+```
+
+On Windows PowerShell: `$env:TRANSLAAS_API_KEY = "your-api-key"`. See [`translaas-sdk-client-integration-tests/README.md`](translaas-sdk-client-integration-tests/README.md).
+
+Local Docker: after `docker compose --profile core up -d` in `platform/translaas`, point at `https://api.translaas.local` with a seeded SDK API key.
+
 ### Coverage (JaCoCo or configured reporter)
 
 ```bash

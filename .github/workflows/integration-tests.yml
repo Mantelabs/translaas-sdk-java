@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   live-api:
-    name: Live API (validate API key)
+    name: Live API (full matrix)
     runs-on: ubuntu-latest
 
     steps:
