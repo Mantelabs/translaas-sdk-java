@@ -43,8 +43,7 @@ public final class TranslationEntries {
     }
     String template;
     if (hasPluralForms(entries, entryKey)) {
-      PluralCategory category =
-          PluralResolver.resolveCategory(number != null ? number : BigDecimal.ZERO, lang);
+      PluralCategory category = PluralResolver.resolveCategory(number, lang);
       template = getPluralForm(entries, entryKey, category);
       if (template == null && category != PluralCategory.OTHER) {
         template = getPluralForm(entries, entryKey, PluralCategory.OTHER);
