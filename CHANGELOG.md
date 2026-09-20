@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+### Changed
+
+- Offline / file-cache `GetEntry` plural selection now uses CLDR cardinal rules for the request locale (via ICU4J), matching the live API, instead of treating `1` as `one` and every other value as `other` (language ignored).
+- `translaas-sdk-models` depends on ICU4J **78.3** (~14.5 MB `icu4j` jar, Unicode-3.0 license) for that selection. Android and other size-sensitive apps should account for the extra package size; the dependency is transitive for every module that uses models, including HTTP-only `translaas-sdk-client`.
+- Missing plural count (`n == null`) on a plural cache entry now selects `other`, instead of coalescing to `0` (which is `one` in French CLDR).
+
 ## [0.5.1] - 2026-07-30
 
 ### Added

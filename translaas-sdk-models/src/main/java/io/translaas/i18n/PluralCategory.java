@@ -1,6 +1,6 @@
 package io.translaas.i18n;
 
-/** Plural categories for offline entry resolution (simplified CLDR). */
+/** CLDR plural categories for offline entry resolution. */
 public enum PluralCategory {
   ZERO("zero"),
   ONE("one"),

@@ -346,7 +346,7 @@ Markup aligns with the .NET Razor **translaas** tag helper: **`group`**, **`entr
 
 ### Other JVM frameworks
 
-Without the starter, you can expose **`TranslaasClient`** / **`TranslaasService`** as **`@Bean`** methods from **`@Configuration`** (for example in Spring Boot), or use **CDI** producers on **Jakarta EE**, **Quarkus**, or **Micronaut**. **Android** is only appropriate if the SDK’s Android policy and dependencies match your app; prefer a dedicated Android artifact if one is published.
+Without the starter, you can expose **`TranslaasClient`** / **`TranslaasService`** as **`@Bean`** methods from **`@Configuration`** (for example in Spring Boot), or use **CDI** producers on **Jakarta EE**, **Quarkus**, or **Micronaut**. **Android** is only appropriate if the SDK’s Android policy and dependencies match your app; prefer a dedicated Android artifact if one is published. Offline CLDR selection pulls in ICU4J (~14.5 MB), which every `io.translaas` module inherits through `translaas-sdk-models`.
 
 ### .NET SDK parity
 
@@ -354,7 +354,7 @@ The Java SDK aligns with the [.NET Translaas.SDK](https://github.com/acuencadev/
 
 | Area | Online (`TranslaasClient` / `t()`) | Offline (`CachingTranslaasClient`) |
 | ---- | ----------------------------------- | ---------------------------------- |
-| Plural selection | Server resolves via `n` / `N` query params | One/other only (`1 → one`, else `other`; language ignored) |
+| Plural selection | Server resolves via `n` / `N` query params | CLDR cardinal via ICU4J (`PluralResolver`) for the request BCP-47 locale (`zero` / `one` / `two` / `few` / `many` / `other`) |
 | Parameter substitution | Server resolves when using `TranslaasClient.getEntry()` | `{name}` placeholders only; case-insensitive keys; auto-`N` from `number` unless explicit `N` is provided |
 | `t()` overloads | Explicit language and auto-language variants including `number` and `parameters` | Same service API; offline cache path uses `PluralResolver` and `ParameterReplacer` in `io.translaas.i18n` |
 

@@ -13,9 +13,13 @@
 
   <artifactId>translaas-sdk-models</artifactId>
   <name>Translaas SDK Models</name>
-  <description>DTOs, enums, and error types (minimal dependencies)</description>
+  <description>DTOs, enums, error types, and offline i18n helpers (Jackson + ICU4J)</description>
 
   <dependencies>
+    <dependency>
+      <groupId>com.ibm.icu</groupId>
+      <artifactId>icu4j</artifactId>
+    </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
