@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.5.2] - 2026-09-30
+
 ### Changed
 
 - Offline / file-cache `GetEntry` plural selection now uses CLDR cardinal rules for the request locale (via ICU4J), matching the live API, instead of treating `1` as `one` and every other value as `other` (language ignored).
